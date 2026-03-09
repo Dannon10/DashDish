@@ -4,10 +4,10 @@ import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
-import useAuthStore from '../app/store/useAuthStore';
-import { supabase } from '../app/services/supabase';
-import { getProfile } from '../app/services/auth.service';
-import colors from '../app/constants/colors';
+import useAuthStore from './store/useAuthStore';
+import { supabase } from './services/supabase';
+import { getProfile } from './services/auth.service';
+import colors from './constants/colors';
 
 const queryClient = new QueryClient({
   defaultOptions: {
