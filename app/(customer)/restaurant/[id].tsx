@@ -77,7 +77,7 @@ export default function RestaurantDetail() {
             <ScrollView showsVerticalScrollIndicator={false}>
 
                 {/* Hero Image */}
-                <View style={tw`h-56 bg-[#141414] relative`}>
+                <View style={tw`h-80 bg-[#141414] relative`}>
                     {restaurant.image_url ? (
                         <Image
                             source={{ uri: restaurant.image_url }}

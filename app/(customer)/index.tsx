@@ -85,8 +85,7 @@ export default function CustomerHome() {
     };
 
     return (
-        // <View style={tw`flex-1 bg-[#0A0A0A]`}>
-        <View style={tw`flex-1 bg-white`}>
+        <View style={tw`flex-1 bg-[#0A0A0A]`}>
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 refreshControl={
@@ -109,7 +108,7 @@ export default function CustomerHome() {
 
                 {/* Search Bar */}
                 <View style={tw`px-5 mb-5`}>
-                    <View style={tw`flex-row items-center bg-white border border-[#2A2A2A] rounded-xl px-4 py-3 gap-3`}>
+                    <View style={tw`flex-row items-center bg-[#141414] border border-[#2A2A2A] rounded-xl px-4 py-3 gap-3`}>
                         <Ionicons name="search-outline" size={20} color={colors.textMuted} />
                         <TextInput
                             style={tw`flex-1 text-white text-base`}

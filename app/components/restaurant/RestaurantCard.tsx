@@ -18,7 +18,7 @@ export default function RestaurantCard({ restaurant }: Props) {
             activeOpacity={0.8}
         >
             {/* Restaurant Image */}
-            <View style={tw`h-44 bg-[#1E1E1E] items-center justify-center`}>
+            <View style={tw`h-65 bg-[#1E1E1E] items-center justify-center`}>
                 {restaurant.image_url ? (
                     <Image
                         source={{ uri: restaurant.image_url }}

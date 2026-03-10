@@ -37,7 +37,7 @@ export default function MenuItem({ item, restaurantId, restaurantName }: Props) 
             {/* Item Image + Add Button */}
             <View style={tw`items-center`}>
                 {/* Image */}
-                <View style={tw`w-24 h-24 rounded-xl bg-[#1E1E1E] items-center justify-center mb-2 overflow-hidden`}>
+                <View style={tw`w-35 h-30 rounded-xl bg-[#1E1E1E] items-center justify-center mb-2 overflow-hidden`}>
                     {item.image_url ? (
                         <Image
                             source={{ uri: item.image_url }}
