@@ -12,9 +12,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-import { signIn, signUp } from '../services/auth.service';
-import { UserRole } from '../types/auth.types';
-import colors from '../constants/colors';
+import { signIn, signUp } from '../../services/auth.service';
+import { UserRole } from '../../types/auth.types';
+import colors from '../../constants/colors';
 
 export default function LoginScreen() {
     const [isRegistering, setIsRegistering] = useState(false);

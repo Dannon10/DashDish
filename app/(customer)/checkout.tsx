@@ -11,12 +11,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-import useCartStore from '../store/useCartStore';
-import useAuthStore from '../store/useAuthStore';
-import formatCurrency from '../utils/formatCurrency';
-import calculateFare from '../utils/calculateFare';
-import colors from '../constants/colors';
-import config from '../constants/config';
+import useCartStore from '../../store/useCartStore';
+import useAuthStore from '../../store/useAuthStore';
+import formatCurrency from '../../utils/formatCurrency';
+import calculateFare from '../../utils/calculateFare';
+import colors from '../../constants/colors';
+import config from '../../constants/config';
 
 // Fixed demo delivery coordinates — Victoria Island, Lagos
 const DEMO_DELIVERY_LAT = 6.4281;

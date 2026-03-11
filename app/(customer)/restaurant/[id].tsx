@@ -11,12 +11,12 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-import { getRestaurantWithMenu } from '../../services/restaurant.service';
-import { RestaurantWithMenu } from '../../types/restaurant.types';
-import MenuCategory from '../../components/restaurant/MenuCategory';
-import useCartStore from '../../store/useCartStore';
-import formatCurrency from '../../utils/formatCurrency';
-import colors from '../../constants/colors';
+import { getRestaurantWithMenu } from '../../../services/restaurant.service';
+import { RestaurantWithMenu } from '../../../types/restaurant.types';
+import MenuCategory from '../../../components/restaurant/MenuCategory';
+import useCartStore from '../../../store/useCartStore';
+import formatCurrency from '../../../utils/formatCurrency';
+import colors from '../../../constants/colors';
 
 export default function RestaurantDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();

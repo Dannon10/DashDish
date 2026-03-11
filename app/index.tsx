@@ -3,8 +3,8 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import React from 'react';
 import tw from 'twrnc';
-import useAuthStore from './store/useAuthStore';
-import colors from './constants/colors';
+import useAuthStore from '../store/useAuthStore';
+import colors from '../constants/colors';
 
 export default function Index() {
   const { isInitialized, session, profile } = useAuthStore();

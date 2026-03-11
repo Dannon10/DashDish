@@ -11,11 +11,11 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-import { createOrder } from '../services/order.service';
-import useCartStore from '../store/useCartStore';
-import useAuthStore from '../store/useAuthStore';
-import formatCurrency from '../utils/formatCurrency';
-import colors from '../constants/colors';
+import { createOrder } from '../../services/order.service';
+import useCartStore from '../../store/useCartStore';
+import useAuthStore from '../../store/useAuthStore';
+import formatCurrency from '../../utils/formatCurrency';
+import colors from '../../constants/colors';
 
 export default function PaymentScreen() {
     const params = useLocalSearchParams<{
@@ -87,11 +87,13 @@ export default function PaymentScreen() {
         clearCart();
         setLoading(false);
 
-        router.replace({
-            pathname: '/(customer)/tracking/[orderId]',
-            params: { orderId },
-        });
+        // router.replace({
+        //     pathname: '/(customer)/tracking/[orderId]',
+        //     params: { orderId },
+        // });
+    router.replace(`/(customer)/tracking/${orderId}`);
     };
+
 
     const handlePayWeb = () => {
         if (!(window as any).PaystackPop) {

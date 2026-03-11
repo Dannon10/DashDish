@@ -12,12 +12,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import tw from 'twrnc';
-import { getRestaurants, searchRestaurants } from '../services/restaurant.service';
-import { Restaurant } from '../types/restaurant.types';
-import RestaurantCard from '../components/restaurant/RestaurantCard';
-import SkeletonCard from '../components/ui/SkeletonCard';
-import useAuthStore from '../store/useAuthStore';
-import colors from '../constants/colors';
+import { getRestaurants, searchRestaurants } from '../../../services/restaurant.service';
+import { Restaurant } from '../../../types/restaurant.types';
+import RestaurantCard from '../../../components/restaurant/RestaurantCard';
+import SkeletonCard from '../../../components/ui/SkeletonCard';
+import useAuthStore from '../../../store/useAuthStore';
+import colors from '../../../constants/colors';
 
 const CATEGORIES = ['All', 'Fast Food', 'Nigerian', 'Grills', 'Pizza', 'Asian', 'Local'];
 

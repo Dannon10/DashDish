@@ -1,4 +1,3 @@
-// services/order.service.ts
 import { supabase } from './supabase';
 import { Order, OrderWithItems } from '../types/order.types';
 

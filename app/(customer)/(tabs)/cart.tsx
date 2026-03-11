@@ -9,9 +9,9 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-import useCartStore from '../store/useCartStore';
-import formatCurrency from '../utils/formatCurrency';
-import colors from '../constants/colors';
+import useCartStore from '../../../store/useCartStore';
+import formatCurrency from '../../../utils/formatCurrency';
+import colors from '../../../constants/colors';
 
 export default function CartScreen() {
     const {
