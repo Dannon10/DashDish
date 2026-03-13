@@ -11,7 +11,6 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import tw from 'twrnc';
 import { Ionicons } from '@expo/vector-icons';
-
 import { supabase } from '../../../services/supabase';
 import {
     getRoute,
@@ -22,12 +21,14 @@ import {
     RouteResult,
     Coordinates,
 } from '../../../services/mapbox.service';
+import { useSmoothedLocation } from '../../../hooks/useSmoothedLocation';
 import useOrderStore from '../../../store/useOrderStore';
 import colors from '../../../constants/colors';
-
 import type { OrderWithItems } from '../../../types/order.types';
 import type { DriverLocation } from '../../../types/driver.types';
 import type { OrderStatus } from '../../../types/database.types';
+
+const SIMULATED_DRIVER_ID = '9b1a9bee-6fca-4384-967d-1907e2bfc29d';
 
 // Lazy-load MapboxGL only on native
 let MapboxGL: typeof import('@rnmapbox/maps').default | null = null;
@@ -36,7 +37,7 @@ if (Platform.OS !== 'web') {
     MapboxGL!.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_TOKEN!);
 }
 
-// Web fallback: static Mapbox image
+// Web fallback
 const WebMap: React.FC<{
     center: [number, number];
     driverCoords: [number, number] | null;
@@ -48,11 +49,10 @@ const WebMap: React.FC<{
         `pin-s-home+22C55E(${deliveryCoords[0]},${deliveryCoords[1]})` +
         (driverCoords ? `,pin-s-bicycle+7C3AED(${driverCoords[0]},${driverCoords[1]})` : '');
     const src = `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${pins}/${lng},${lat},14,0/600x300@2x?access_token=${TOKEN}`;
-
     return (
         <View style={tw`flex-1 bg-[${colors.surfaceElevated}] overflow-hidden`}>
-            {/* @ts-ignore — img is valid on web */}
-            <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Delivery map" />
+            {/* @ts-ignore */}
+            <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="map" />
         </View>
     );
 };
@@ -82,14 +82,13 @@ function stepIndex(status: OrderStatus): number {
     return idx === -1 ? 0 : idx;
 }
 
-// Screen
 export default function OrderTrackingScreen() {
     const { orderId } = useLocalSearchParams<{ orderId: string }>();
     const router = useRouter();
     const { activeOrder, setActiveOrder, updateActiveOrderStatus } = useOrderStore();
 
     const [order, setOrder] = useState<OrderWithItems | null>(activeOrder);
-    const [driverLocation, setDriverLocation] = useState<DriverLocation | null>(null);
+    const [rawDriverLocation, setRawDriverLocation] = useState<DriverLocation | null>(null);
     const [route, setRoute] = useState<RouteResult | null>(null);
     const [driverProfile, setDriverProfile] = useState<{
         full_name: string;
@@ -102,7 +101,13 @@ export default function OrderTrackingScreen() {
     const unsubDriverRef = useRef<(() => void) | null>(null);
     const unsubOrderRef = useRef<(() => void) | null>(null);
 
-    // Fetch order if not in store
+    // Smooth interpolated driver position
+    const smoothedLocation = useSmoothedLocation(
+        rawDriverLocation ? { lat: rawDriverLocation.lat, lng: rawDriverLocation.lng } : null,
+        1800 // animate over 1.8s between 2s GPS updates
+    );
+
+    // Fetch order
     useEffect(() => {
         if (activeOrder?.id === orderId) {
             setOrder(activeOrder);
@@ -123,19 +128,6 @@ export default function OrderTrackingScreen() {
         })();
     }, [orderId]);
 
-    // Fetch driver profile
-    useEffect(() => {
-        if (!order?.driver_id) return;
-        (async () => {
-            const { data } = await supabase
-                .from('profiles')
-                .select('full_name, avatar_url, phone')
-                .eq('id', order.driver_id!)
-                .single();
-            if (data) setDriverProfile(data);
-        })();
-    }, [order?.driver_id]);
-
     // Realtime: order status
     useEffect(() => {
         if (!orderId) return;
@@ -149,46 +141,69 @@ export default function OrderTrackingScreen() {
             }, (payload) => {
                 const updated = payload.new as { status: OrderStatus; driver_id: string | null };
                 updateActiveOrderStatus(updated.status);
-                setOrder((prev) => prev ? { ...prev, status: updated.status, driver_id: updated.driver_id } : prev);
+                setOrder((prev) =>
+                    prev ? { ...prev, status: updated.status, driver_id: updated.driver_id } : prev
+                );
             })
             .subscribe();
         unsubOrderRef.current = () => supabase.removeChannel(channel);
         return () => unsubOrderRef.current?.();
     }, [orderId]);
 
-    // Realtime: driver location
+    // Driver location subscription — starts immediately with simulated driver ID
     useEffect(() => {
-        if (!order?.driver_id) return;
-        if (!['picked_up', 'on_the_way'].includes(order.status)) return;
+        if (!order) return;
 
+        const driverIdToTrack = order.driver_id ?? SIMULATED_DRIVER_ID;
+
+        // Fetch initial position
         (async () => {
-            const loc = await getDriverLocation(order.driver_id!);
+            const loc = await getDriverLocation(driverIdToTrack);
             if (loc) {
-                setDriverLocation(loc);
-                await refreshRoute({ 
-                    lat: loc.lat, lng: loc.lng }, 
-                    { 
-                        lat: order.delivery_lat,
-                        lng: order.delivery_lng 
-                    });
+                setRawDriverLocation(loc);
+                await refreshRoute(
+                    { lat: loc.lat, lng: loc.lng },
+                    { lat: order.delivery_lat, lng: order.delivery_lng }
+                );
             }
         })();
 
-        unsubDriverRef.current = subscribeToDriverLocation(order.driver_id, async (loc) => {
-            setDriverLocation(loc);
-            await refreshRoute({ 
-                lat: loc.lat, 
-                lng: loc.lng
-            }, 
-            { 
-                lat: order.delivery_lat,
-                lng: order.delivery_lng 
-            });
-            if (Platform.OS !== 'web') cameraRef.current?.moveTo([loc.lng, loc.lat], 500);
+        // Subscribe to live updates
+        unsubDriverRef.current?.();
+        unsubDriverRef.current = subscribeToDriverLocation(driverIdToTrack, async (loc) => {
+            setRawDriverLocation(loc);
+            await refreshRoute(
+                { lat: loc.lat, lng: loc.lng },
+                { lat: order.delivery_lat, lng: order.delivery_lng }
+            );
         });
 
         return () => unsubDriverRef.current?.();
-    }, [order?.driver_id, order?.status]);
+    }, [order?.id, order?.driver_id]);
+
+    // Pan camera to follow smoothed driver position
+    useEffect(() => {
+        if (!smoothedLocation || Platform.OS === 'web') return;
+        cameraRef.current?.setCamera({
+            centerCoordinate: [smoothedLocation.lng, smoothedLocation.lat],
+            zoomLevel: 14,
+            animationDuration: 1000,
+            animationMode: 'flyTo',
+        });
+    }, [smoothedLocation?.lat, smoothedLocation?.lng]);
+
+    // Fetch driver profile
+    useEffect(() => {
+        if (!order?.driver_id) return;
+        (async () => {
+            const { data } = await supabase
+                .from('profiles')
+                .select('full_name, avatar_url, phone')
+                .eq('id', order.driver_id!)
+                .single();
+            if (data) setDriverProfile(data);
+        })();
+    }, [order?.driver_id]);
 
     const refreshRoute = useCallback(async (origin: Coordinates, destination: Coordinates) => {
         const result = await getRoute(origin, destination);
@@ -199,12 +214,35 @@ export default function OrderTrackingScreen() {
     const currentStatus: OrderStatus = order?.status ?? 'placed';
     const currentStepIdx = stepIndex(currentStatus);
     const accentColor = STATUS_COLOR[currentStatus] ?? colors.primary;
-    const isDriverTracking = driverLocation !== null && ['picked_up', 'on_the_way'].includes(currentStatus);
-    const mapCenter: [number, number] = driverLocation
-        ? [driverLocation.lng, driverLocation.lat]
+    const isDriverVisible = smoothedLocation !== null
+        && currentStatus !== 'delivered'
+        && currentStatus !== 'cancelled';
+
+    // Use smoothed location for map rendering
+    const mapCenter: [number, number] = smoothedLocation
+        ? [smoothedLocation.lng, smoothedLocation.lat]
         : order ? [order.delivery_lng, order.delivery_lat] : [3.3792, 6.5244];
-    const deliveryCoords: [number, number] = order ? [order.delivery_lng, order.delivery_lat] : [3.3792, 6.5244];
-    const driverCoords: [number, number] | null = driverLocation ? [driverLocation.lng, driverLocation.lat] : null;
+
+    const deliveryCoords: [number, number] = order
+        ? [order.delivery_lng, order.delivery_lat]
+        : [3.3792, 6.5244];
+
+    const driverCoords: [number, number] | null = smoothedLocation
+        ? [smoothedLocation.lng, smoothedLocation.lat]
+        : null;
+
+    // GeoJSON for smooth ShapeSource driver marker
+    const driverGeoJSON = smoothedLocation ? {
+        type: 'FeatureCollection' as const,
+        features: [{
+            type: 'Feature' as const,
+            geometry: {
+                type: 'Point' as const,
+                coordinates: [smoothedLocation.lng, smoothedLocation.lat],
+            },
+            properties: {},
+        }],
+    } : null;
 
     if (loading) {
         return (
@@ -232,7 +270,11 @@ export default function OrderTrackingScreen() {
             {/* Map */}
             <View style={tw`h-[42%]`}>
                 {Platform.OS === 'web' ? (
-                    <WebMap center={mapCenter} driverCoords={driverCoords} deliveryCoords={deliveryCoords} />
+                    <WebMap
+                        center={mapCenter}
+                        driverCoords={driverCoords}
+                        deliveryCoords={deliveryCoords}
+                    />
                 ) : MapboxGL ? (
                     <MapboxGL.MapView
                         style={tw`flex-1`}
@@ -246,27 +288,66 @@ export default function OrderTrackingScreen() {
                             centerCoordinate={mapCenter}
                             zoomLevel={14}
                             animationMode="flyTo"
-                            animationDuration={800}
+                            animationDuration={1000}
                         />
+
+                        {/* Route line */}
                         {route && (
                             <MapboxGL.ShapeSource
                                 id="routeSource"
-                                shape={{ type: 'Feature', geometry: { type: 'LineString', coordinates: route.coordinates }, properties: {} }}
+                                shape={{
+                                    type: 'Feature',
+                                    geometry: { type: 'LineString', coordinates: route.coordinates },
+                                    properties: {},
+                                }}
                             >
                                 <MapboxGL.LineLayer
                                     id="routeLine"
-                                    style={{ lineColor: accentColor, lineWidth: 4, lineOpacity: 0.85, lineCap: 'round', lineJoin: 'round' }}
+                                    style={{
+                                        lineColor: accentColor,
+                                        lineWidth: 4,
+                                        lineOpacity: 0.85,
+                                        lineCap: 'round',
+                                        lineJoin: 'round',
+                                    }}
                                 />
                             </MapboxGL.ShapeSource>
                         )}
-                        {isDriverTracking && (
-                            <MapboxGL.PointAnnotation id="driverMarker" coordinate={[driverLocation!.lng, driverLocation!.lat]}>
-                                <View style={tw`w-10 h-10 rounded-full bg-[${colors.primary}] items-center justify-center border-2 border-white`}>
-                                    <Ionicons name="bicycle" size={20} color={colors.white} />
-                                </View>
-                            </MapboxGL.PointAnnotation>
+
+                        {/* Driver marker — ShapeSource for smooth animation */}
+                        {isDriverVisible && driverGeoJSON && (
+                            <MapboxGL.ShapeSource
+                                id="driverSource"
+                                shape={driverGeoJSON}
+                            >
+                                <MapboxGL.CircleLayer
+                                    id="driverCircle"
+                                    style={{
+                                        circleRadius: 20,
+                                        circleColor: colors.primary,
+                                        circleStrokeWidth: 2.5,
+                                        circleStrokeColor: '#FFFFFF',
+                                        circlePitchAlignment: 'map',
+                                    }}
+                                />
+                                <MapboxGL.SymbolLayer
+                                    id="driverIcon"
+                                    style={{
+                                        iconImage: 'bicycle-15',
+                                        iconSize: 1.3,
+                                        iconColor: '#FFFFFF',
+                                        iconAllowOverlap: true,
+                                        iconIgnorePlacement: true,
+                                    }}
+                                />
+                            </MapboxGL.ShapeSource>
                         )}
-                        <MapboxGL.PointAnnotation id="deliveryPin" coordinate={[order.delivery_lng, order.delivery_lat]}>
+
+                        {/* Delivery pin */}
+                        <MapboxGL.PointAnnotation
+                            id="deliveryPin"
+                            coordinate={[order.delivery_lng, order.delivery_lat]}
+                        >
                             <View style={tw`w-9 h-9 rounded-full bg-[${colors.success}] items-center justify-center border-2 border-white`}>
                                 <Ionicons name="home" size={16} color={colors.white} />
                             </View>
@@ -293,10 +374,12 @@ export default function OrderTrackingScreen() {
                     <View style={tw`w-10 h-1 rounded-full bg-[${colors.border}]`} />
                 </View>
 
-                {/* ETA + badge */}
+                {/* ETA + status badge */}
                 <View style={tw`flex-row items-center justify-between px-5 pt-4 pb-2`}>
                     <View>
-                        <Text style={tw`text-[${colors.textSecondary}] text-xs mb-0.5`}>Estimated arrival</Text>
+                        <Text style={tw`text-[${colors.textSecondary}] text-xs mb-0.5`}>
+                            Estimated arrival
+                        </Text>
                         <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>
                             {route ? formatETA(route.durationSeconds) : '—'}
                         </Text>
@@ -324,8 +407,12 @@ export default function OrderTrackingScreen() {
                             </View>
                         )}
                         <View style={tw`flex-1 ml-3`}>
-                            <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base`}>{driverProfile.full_name}</Text>
-                            <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>Your delivery driver</Text>
+                            <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base`}>
+                                {driverProfile.full_name}
+                            </Text>
+                            <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>
+                                Your delivery driver
+                            </Text>
                         </View>
                         {driverProfile.phone && (
                             <TouchableOpacity style={tw`w-10 h-10 rounded-full bg-[${colors.primary}] items-center justify-center`}>
@@ -337,7 +424,9 @@ export default function OrderTrackingScreen() {
 
                 {/* Status timeline */}
                 <View style={tw`mx-5 mt-5`}>
-                    <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base mb-4`}>Order Progress</Text>
+                    <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base mb-4`}>
+                        Order Progress
+                    </Text>
                     {STATUS_STEPS.map((step, idx) => {
                         const isCompleted = idx < currentStepIdx;
                         const isActive = idx === currentStepIdx;
@@ -350,11 +439,24 @@ export default function OrderTrackingScreen() {
                                 <View style={tw`items-center mr-4`}>
                                     <View style={[
                                         tw`w-8 h-8 rounded-full items-center justify-center`,
-                                        { backgroundColor: isUpcoming ? colors.surfaceElevated : `${dotColor}22`, borderWidth: isActive ? 2 : 0, borderColor: dotColor },
+                                        {
+                                            backgroundColor: isUpcoming ? colors.surfaceElevated : `${dotColor}22`,
+                                            borderWidth: isActive ? 2 : 0,
+                                            borderColor: dotColor,
+                                        },
                                     ]}>
-                                        <Ionicons name={step.icon as any} size={16} color={isUpcoming ? colors.textMuted : dotColor} />
+                                        <Ionicons
+                                            name={step.icon as any}
+                                            size={16}
+                                            color={isUpcoming ? colors.textMuted : dotColor}
+                                        />
                                     </View>
-                                    {!isLast && <View style={[tw`w-0.5 flex-1 my-1`, { backgroundColor: lineColor, minHeight: 20 }]} />}
+                                    {!isLast && (
+                                        <View style={[
+                                            tw`w-0.5 flex-1 my-1`,
+                                            { backgroundColor: lineColor, minHeight: 20 },
+                                        ]} />
+                                    )}
                                 </View>
                                 <View style={tw`flex-1 pb-5 justify-center`}>
                                     <Text style={[tw`font-medium`, {
@@ -363,8 +465,16 @@ export default function OrderTrackingScreen() {
                                     }]}>
                                         {step.label}
                                     </Text>
-                                    {isActive && <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>In progress...</Text>}
-                                    {isCompleted && <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>Done ✓</Text>}
+                                    {isActive && (
+                                        <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>
+                                            In progress...
+                                        </Text>
+                                    )}
+                                    {isCompleted && (
+                                        <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>
+                                            Done ✓
+                                        </Text>
+                                    )}
                                 </View>
                             </View>
                         );
@@ -373,16 +483,24 @@ export default function OrderTrackingScreen() {
 
                 {/* Order summary */}
                 <View style={tw`mx-5 mt-2`}>
-                    <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base mb-3`}>{order.restaurants?.name}</Text>
+                    <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base mb-3`}>
+                        {order.restaurants?.name}
+                    </Text>
                     {order.order_items?.map((item) => (
                         <View key={item.id} style={tw`flex-row justify-between py-1.5`}>
-                            <Text style={tw`text-[${colors.textSecondary}] text-sm`}>{item.quantity}× {item.menu_items?.name}</Text>
-                            <Text style={tw`text-[${colors.textSecondary}] text-sm`}>₦{(item.unit_price * item.quantity).toLocaleString()}</Text>
+                            <Text style={tw`text-[${colors.textSecondary}] text-sm`}>
+                                {item.quantity}× {item.menu_items?.name}
+                            </Text>
+                            <Text style={tw`text-[${colors.textSecondary}] text-sm`}>
+                                ₦{(item.unit_price * item.quantity).toLocaleString()}
+                            </Text>
                         </View>
                     ))}
                     <View style={tw`flex-row justify-between pt-3 mt-1 border-t border-[${colors.border}]`}>
                         <Text style={tw`text-[${colors.textPrimary}] font-semibold`}>Total</Text>
-                        <Text style={tw`text-[${colors.textPrimary}] font-semibold`}>₦{order.total_amount.toLocaleString()}</Text>
+                        <Text style={tw`text-[${colors.textPrimary}] font-semibold`}>
+                            ₦{order.total_amount.toLocaleString()}
+                        </Text>
                     </View>
                 </View>
             </ScrollView>

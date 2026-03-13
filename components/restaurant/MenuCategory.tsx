@@ -8,9 +8,17 @@ interface Props {
     category: MenuCategoryWithItems;
     restaurantId: string;
     restaurantName: string;
+    restaurantLat: number;
+    restaurantLng: number;
 }
 
-export default function MenuCategory({ category, restaurantId, restaurantName }: Props) {
+export default function MenuCategory({
+    category,
+    restaurantId,
+    restaurantName,
+    restaurantLat,
+    restaurantLng,
+}: Props) {
     const availableItems = category.menu_items.filter(item => item.is_available);
 
     if (availableItems.length === 0) return null;
@@ -26,6 +34,8 @@ export default function MenuCategory({ category, restaurantId, restaurantName }:
                     item={item}
                     restaurantId={restaurantId}
                     restaurantName={restaurantName}
+                    restaurantLat={restaurantLat}
+                    restaurantLng={restaurantLng}
                 />
             ))}
         </View>

@@ -6,7 +6,6 @@ const DIRECTIONS_BASE = 'https://api.mapbox.com/directions/v5/mapbox/driving';
 const GEOCODING_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
 // Types
-
 export interface Coordinates {
     lat: number;
     lng: number;
@@ -23,7 +22,7 @@ export interface GeocodingResult {
     coordinates: Coordinates;
 }
 
-// Directions 
+// Directions
 export async function getRoute(
     origin: Coordinates,
     destination: Coordinates
@@ -104,7 +103,7 @@ export async function reverseGeocode(
     }
 }
 
-// Real-time Driver Location 
+// Realtime driver location subscription
 export function subscribeToDriverLocation(
     driverId: string,
     onUpdate: (location: DriverLocation) => void
@@ -120,19 +119,17 @@ export function subscribeToDriverLocation(
                 filter: `driver_id=eq.${driverId}`,
             },
             (payload) => {
-                const updated = payload.new as DriverLocation;
-                onUpdate(updated);
+                onUpdate(payload.new as DriverLocation);
             }
         )
         .subscribe();
 
-    // Return an unsubscribe function
     return () => {
         supabase.removeChannel(channel);
     };
 }
 
-/*Fetch the current driver location once (no subscription).*/
+// Fetch current driver location once — returns null if no row exists yet
 export async function getDriverLocation(
     driverId: string
 ): Promise<DriverLocation | null> {
@@ -140,7 +137,7 @@ export async function getDriverLocation(
         .from('driver_locations')
         .select('*')
         .eq('driver_id', driverId)
-        .single();
+        .maybeSingle(); // ← was .single(), which throws when row doesn't exist yet
 
     if (error) {
         console.error('[mapbox] getDriverLocation error:', error.message);
@@ -149,7 +146,7 @@ export async function getDriverLocation(
     return data;
 }
 
-// ─── ETA Helpers
+// ETA helpers
 export function formatETA(seconds: number): string {
     const mins = Math.round(seconds / 60);
     if (mins < 1) return 'Less than a min';

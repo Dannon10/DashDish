@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,35 +6,38 @@ import {
     TouchableOpacity,
     TextInput,
     ActivityIndicator,
+    Alert,
 } from 'react-native';
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
+
 import useCartStore from '../../store/useCartStore';
 import useAuthStore from '../../store/useAuthStore';
 import formatCurrency from '../../utils/formatCurrency';
 import calculateFare from '../../utils/calculateFare';
+import { forwardGeocode } from '../../services/mapbox.service';
 import colors from '../../constants/colors';
-import config from '../../constants/config';
 
-// Fixed demo delivery coordinates — Victoria Island, Lagos
-const DEMO_DELIVERY_LAT = 6.4281;
-const DEMO_DELIVERY_LNG = 3.4219;
-const DEMO_DISTANCE_KM = 3.5; // Fixed demo distance until Mapbox is integrated
+// Fallback delivery coords (Victoria Island, Lagos) if geocoding fails
+const FALLBACK_LAT = 6.4281;
+const FALLBACK_LNG = 3.4219;
+const DEMO_DISTANCE_KM = 3.5;
 
 export default function CheckoutScreen() {
-    const { items, restaurantName, getTotalPrice, restaurantId } = useCartStore();
+    const { items, restaurantName, restaurantId, restaurantLat, restaurantLng, getTotalPrice } =
+        useCartStore();
     const { profile } = useAuthStore();
 
     const [address, setAddress] = useState('');
     const [addressError, setAddressError] = useState<string | null>(null);
+    const [geocoding, setGeocoding] = useState(false);
 
     const subtotal = getTotalPrice();
     const deliveryFee = calculateFare(DEMO_DISTANCE_KM);
     const total = subtotal + deliveryFee;
 
-    const handleProceedToPayment = () => {
+    const handleProceedToPayment = async () => {
         if (!address.trim()) {
             setAddressError('Please enter your delivery address');
             return;
@@ -45,30 +48,52 @@ export default function CheckoutScreen() {
         }
 
         setAddressError(null);
+        setGeocoding(true);
 
-        // Pass order details to payment screen via router params
+        // Geocode the delivery address to get real coords
+        let deliveryLat = FALLBACK_LAT;
+        let deliveryLng = FALLBACK_LNG;
+
+        try {
+            const result = await forwardGeocode(address.trim());
+            if (result) {
+                deliveryLat = result.coordinates.lat;
+                deliveryLng = result.coordinates.lng;
+            } else {
+                // Geocoding returned nothing — use fallback silently
+                console.warn('[checkout] geocoding returned null, using fallback coords');
+            }
+        } catch (err) {
+            console.warn('[checkout] geocoding failed, using fallback coords:', err);
+        } finally {
+            setGeocoding(false);
+        }
+
         router.push({
             pathname: '/(customer)/payment',
             params: {
                 address: address.trim(),
-                deliveryLat: DEMO_DELIVERY_LAT,
-                deliveryLng: DEMO_DELIVERY_LNG,
-                deliveryFee: deliveryFee,
-                subtotal: subtotal,
-                total: total,
-                restaurantId: restaurantId,
+                deliveryLat,
+                deliveryLng,
+                deliveryFee,
+                subtotal,
+                total,
+                restaurantId,
+                restaurantLat: restaurantLat ?? 6.5244,
+                restaurantLng: restaurantLng ?? 3.3792,
             },
         });
     };
 
+    useEffect(() => {
     if (items.length === 0) {
-        router.replace('/(customer)/cart');
-        return null;
+        router.replace('/(customer)/(tabs)/');
+        // router.replace('/(customer)/cart');
     }
+}, [items.length]);
 
     return (
         <View style={tw`flex-1 bg-[#0A0A0A]`}>
-
             {/* Header */}
             <View style={tw`px-5 pt-14 pb-4 flex-row items-center gap-4`}>
                 <TouchableOpacity
@@ -81,14 +106,16 @@ export default function CheckoutScreen() {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-
                 {/* Delivery Address */}
                 <View style={tw`px-5 mb-6`}>
                     <Text style={tw`text-white font-bold text-lg mb-4`}>
                         Delivery Address
                     </Text>
-                    <View style={tw`bg-[#141414] border ${addressError ? 'border-red-500' : 'border-[#2A2A2A]'
-                        } rounded-xl p-4`}>
+                    <View
+                        style={tw`bg-[#141414] border ${
+                            addressError ? 'border-red-500' : 'border-[#2A2A2A]'
+                        } rounded-xl p-4`}
+                    >
                         <View style={tw`flex-row items-start gap-3`}>
                             <Ionicons
                                 name="location-outline"
@@ -114,11 +141,11 @@ export default function CheckoutScreen() {
                         <Text style={tw`text-red-400 text-xs mt-2 ml-1`}>{addressError}</Text>
                     )}
                     <Text style={tw`text-[#555555] text-xs mt-2 ml-1`}>
-                        Demo app — delivery routes around Lagos Island area
+                        Your address will be geocoded for accurate tracking
                     </Text>
                 </View>
 
-                {/* Order Items */}
+                {/* Order items */}
                 <View style={tw`px-5 mb-6`}>
                     <Text style={tw`text-white font-bold text-lg mb-4`}>
                         Order from {restaurantName}
@@ -127,12 +154,17 @@ export default function CheckoutScreen() {
                         {items.map(({ menuItem, quantity }, index) => (
                             <View
                                 key={menuItem.id}
-                                style={tw`flex-row items-center justify-between px-4 py-3 ${index < items.length - 1 ? 'border-b border-[#1E1E1E]' : ''
-                                    }`}
+                                style={tw`flex-row items-center justify-between px-4 py-3 ${
+                                    index < items.length - 1 ? 'border-b border-[#1E1E1E]' : ''
+                                }`}
                             >
                                 <View style={tw`flex-row items-center gap-3 flex-1`}>
-                                    <View style={tw`w-6 h-6 bg-[#7C3AED]/20 rounded-full items-center justify-center`}>
-                                        <Text style={tw`text-[#7C3AED] text-xs font-bold`}>{quantity}</Text>
+                                    <View
+                                        style={tw`w-6 h-6 bg-[#7C3AED]/20 rounded-full items-center justify-center`}
+                                    >
+                                        <Text style={tw`text-[#7C3AED] text-xs font-bold`}>
+                                            {quantity}
+                                        </Text>
                                     </View>
                                     <Text style={tw`text-white text-sm flex-1`} numberOfLines={1}>
                                         {menuItem.name}
@@ -146,33 +178,21 @@ export default function CheckoutScreen() {
                     </View>
                 </View>
 
-                {/* Price Breakdown */}
+                {/* Price breakdown */}
                 <View style={tw`mx-5 bg-[#141414] rounded-2xl p-5 mb-8`}>
-                    <Text style={tw`text-white font-bold text-lg mb-4`}>
-                        Price Breakdown
-                    </Text>
-
+                    <Text style={tw`text-white font-bold text-lg mb-4`}>Price Breakdown</Text>
                     <View style={tw`flex-row justify-between mb-3`}>
                         <Text style={tw`text-[#A0A0A0]`}>Subtotal</Text>
-                        <Text style={tw`text-white font-semibold`}>
-                            {formatCurrency(subtotal)}
-                        </Text>
+                        <Text style={tw`text-white font-semibold`}>{formatCurrency(subtotal)}</Text>
                     </View>
-
                     <View style={tw`flex-row justify-between mb-3`}>
                         <View style={tw`flex-row items-center gap-1`}>
                             <Text style={tw`text-[#A0A0A0]`}>Delivery fee</Text>
-                            <Text style={tw`text-[#555555] text-xs`}>
-                                ({DEMO_DISTANCE_KM}km)
-                            </Text>
+                            <Text style={tw`text-[#555555] text-xs`}>({DEMO_DISTANCE_KM}km)</Text>
                         </View>
-                        <Text style={tw`text-white font-semibold`}>
-                            {formatCurrency(deliveryFee)}
-                        </Text>
+                        <Text style={tw`text-white font-semibold`}>{formatCurrency(deliveryFee)}</Text>
                     </View>
-
                     <View style={tw`h-px bg-[#2A2A2A] my-3`} />
-
                     <View style={tw`flex-row justify-between`}>
                         <Text style={tw`text-white font-bold text-base`}>Total</Text>
                         <Text style={tw`text-[#7C3AED] font-bold text-lg`}>
@@ -180,22 +200,34 @@ export default function CheckoutScreen() {
                         </Text>
                     </View>
                 </View>
-
             </ScrollView>
 
-            {/* Pay Button */}
+            {/* Proceed button */}
             <View style={tw`px-5 pb-8 pt-4 bg-[#0A0A0A] border-t border-[#1E1E1E]`}>
                 <TouchableOpacity
-                    style={tw`bg-[#7C3AED] py-4 rounded-xl items-center flex-row justify-center gap-2`}
+                    style={tw`bg-[#7C3AED] py-4 rounded-xl items-center flex-row justify-center gap-2 ${
+                        geocoding ? 'opacity-70' : ''
+                    }`}
                     onPress={handleProceedToPayment}
+                    disabled={geocoding}
                 >
-                    <Ionicons name="card-outline" size={20} color="white" />
-                    <Text style={tw`text-white font-bold text-base`}>
-                        Pay {formatCurrency(total)}
-                    </Text>
+                    {geocoding ? (
+                        <>
+                            <ActivityIndicator size="small" color="white" />
+                            <Text style={tw`text-white font-bold text-base`}>
+                                Finding your location...
+                            </Text>
+                        </>
+                    ) : (
+                        <>
+                            <Ionicons name="card-outline" size={20} color="white" />
+                            <Text style={tw`text-white font-bold text-base`}>
+                                Pay {formatCurrency(total)}
+                            </Text>
+                        </>
+                    )}
                 </TouchableOpacity>
             </View>
-
         </View>
     );
 }

@@ -11,6 +11,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
+
 import { getRestaurantWithMenu } from '../../../services/restaurant.service';
 import { RestaurantWithMenu } from '../../../types/restaurant.types';
 import MenuCategory from '../../../components/restaurant/MenuCategory';
@@ -24,9 +25,8 @@ export default function RestaurantDetail() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const { items, getTotalItems, getTotalPrice, restaurantId } = useCartStore();
+    const { getTotalItems, getTotalPrice, restaurantId } = useCartStore();
 
-    // Cart belongs to a different restaurant
     const cartIsFromHere = restaurantId === id;
     const cartItemCount = cartIsFromHere ? getTotalItems() : 0;
     const cartTotal = cartIsFromHere ? getTotalPrice() : 0;
@@ -99,10 +99,12 @@ export default function RestaurantDetail() {
                     </TouchableOpacity>
 
                     {/* Open/Closed Badge */}
-                    <View style={tw`absolute top-12 right-4 px-3 py-1 rounded-full ${restaurant.is_open ? 'bg-green-500/20' : 'bg-red-500/20'
+                    <View style={tw`absolute top-12 right-4 px-3 py-1 rounded-full ${
+                        restaurant.is_open ? 'bg-green-500/20' : 'bg-red-500/20'
+                    }`}>
+                        <Text style={tw`text-xs font-semibold ${
+                            restaurant.is_open ? 'text-green-400' : 'text-red-400'
                         }`}>
-                        <Text style={tw`text-xs font-semibold ${restaurant.is_open ? 'text-green-400' : 'text-red-400'
-                            }`}>
                             {restaurant.is_open ? 'Open Now' : 'Closed'}
                         </Text>
                     </View>
@@ -116,8 +118,6 @@ export default function RestaurantDetail() {
                     <Text style={tw`text-[#A0A0A0] text-sm mb-4`}>
                         {restaurant.description}
                     </Text>
-
-                    {/* Stats Row */}
                     <View style={tw`flex-row gap-5`}>
                         <View style={tw`flex-row items-center gap-1`}>
                             <Ionicons name="star" size={15} color="#F59E0B" />
@@ -151,6 +151,8 @@ export default function RestaurantDetail() {
                                 category={category}
                                 restaurantId={restaurant.id}
                                 restaurantName={restaurant.name}
+                                restaurantLat={restaurant.lat}
+                                restaurantLng={restaurant.lng}
                             />
                         ))}
                 </View>

@@ -1,15 +1,28 @@
-const { getDefaultConfig } = require('expo/metro-config');
+// cssTransformer.js — placed at project root
+// Handles mapbox-gl CSS imports for web; ignores them on native
 
-const config = getDefaultConfig(__dirname);
+const upstreamTransformer = require('@expo/metro-config/build/transform-worker/metro-transform-worker');
 
-// Allow Metro to handle CSS files (required by mapbox-gl on web)
-config.resolver.assetExts = config.resolver.assetExts.filter(ext => ext !== 'css');
-config.resolver.sourceExts = [...config.resolver.sourceExts, 'css'];
-
-// Transform CSS files as empty modules on native, real CSS on web
-config.transformer = {
-    ...config.transformer,
-    babelTransformerPath: require.resolve('./cssTransformer.js'),
+module.exports.transform = async function ({ src, filename, options, ...rest }) {
+    if (filename.endsWith('.css')) {
+        // On web: pass CSS through as-is so the browser can load it
+        // On native: return an empty module (CSS doesn't apply)
+        const isWeb = options?.platform === 'web';
+        if (isWeb) {
+            return upstreamTransformer.transform({
+                src,
+                filename,
+                options,
+                ...rest,
+            });
+        }
+        // Native — return empty module
+        return upstreamTransformer.transform({
+            src: '',
+            filename,
+            options,
+            ...rest,
+        });
+    }
+    return upstreamTransformer.transform({ src, filename, options, ...rest });
 };
-
-module.exports = config;

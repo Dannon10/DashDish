@@ -15,6 +15,7 @@ import tw from 'twrnc';
 import { signIn, signUp } from '../../services/auth.service';
 import { UserRole } from '../../types/auth.types';
 import colors from '../../constants/colors';
+import RoleSelect from '../../components/auth/role-select';
 
 export default function LoginScreen() {
     const [isRegistering, setIsRegistering] = useState(false);
@@ -106,56 +107,7 @@ export default function LoginScreen() {
 
                 {/* Role Selection — signup only */}
                 {isRegistering && (
-                    <View style={tw`mb-6`}>
-                        <Text style={tw`text-[#A0A0A0] text-sm mb-3`}>I want to</Text>
-                        <View style={tw`flex-row gap-3`}>
-
-                            {/* Customer Card */}
-                            <TouchableOpacity
-                                style={tw`flex-1 p-4 rounded-xl border-2 items-center ${role === 'customer'
-                                        ? 'border-[#7C3AED] bg-[#7C3AED]/10'
-                                        : 'border-[#2A2A2A] bg-[#141414]'
-                                    }`}
-                                onPress={() => setRole('customer')}
-                            >
-                                <Ionicons
-                                    name="bag-handle-outline"
-                                    size={28}
-                                    color={role === 'customer' ? colors.primary : colors.textSecondary}
-                                />
-                                <Text style={tw`mt-2 font-semibold ${role === 'customer' ? 'text-[#7C3AED]' : 'text-[#A0A0A0]'
-                                    }`}>
-                                    Order Food
-                                </Text>
-                                <Text style={tw`text-xs text-[#555555] mt-1 text-center`}>
-                                    Customer
-                                </Text>
-                            </TouchableOpacity>
-
-                            {/* Driver Card */}
-                            <TouchableOpacity
-                                style={tw`flex-1 p-4 rounded-xl border-2 items-center ${role === 'driver'
-                                        ? 'border-[#7C3AED] bg-[#7C3AED]/10'
-                                        : 'border-[#2A2A2A] bg-[#141414]'
-                                    }`}
-                                onPress={() => setRole('driver')}
-                            >
-                                <Ionicons
-                                    name="bicycle-outline"
-                                    size={28}
-                                    color={role === 'driver' ? colors.primary : colors.textSecondary}
-                                />
-                                <Text style={tw`mt-2 font-semibold ${role === 'driver' ? 'text-[#7C3AED]' : 'text-[#A0A0A0]'
-                                    }`}>
-                                    Deliver Food
-                                </Text>
-                                <Text style={tw`text-xs text-[#555555] mt-1 text-center`}>
-                                    Driver
-                                </Text>
-                            </TouchableOpacity>
-
-                        </View>
-                    </View>
+                    <RoleSelect role={role} setRole={setRole} />
                 )}
 
                 {/* Full Name — signup only */}

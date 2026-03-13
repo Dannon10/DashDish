@@ -16,9 +16,12 @@ import useCartStore from '../../store/useCartStore';
 import useAuthStore from '../../store/useAuthStore';
 import formatCurrency from '../../utils/formatCurrency';
 import colors from '../../constants/colors';
+import { startDeliverySimulation, ensureSimulatedDriver } from '../../utils/simulateDelivery';
 
 export default function PaymentScreen() {
     const params = useLocalSearchParams<{
+        restaurantLng: string;
+        restaurantLat: string;
         address: string;
         deliveryLat: string;
         deliveryLng: string;
@@ -59,40 +62,87 @@ export default function PaymentScreen() {
         };
     }, []);
 
+    // const handleCreateOrder = async (reference: string) => {
+    //     setLoading(true);
+
+    //     const { orderId, error } = await createOrder({
+    //         customer_id: profile!.id,
+    //         restaurant_id: params.restaurantId,
+    //         items: items.map(({ menuItem, quantity }) => ({
+    //             menu_item_id: menuItem.id,
+    //             quantity,
+    //             unit_price: menuItem.price,
+    //         })),
+    //         total_amount: total,
+    //         delivery_fee: deliveryFee,
+    //         delivery_address: params.address,
+    //         delivery_lat: parseFloat(params.deliveryLat),
+    //         delivery_lng: parseFloat(params.deliveryLng),
+    //         payment_reference: reference,
+    //     });
+
+    //     if (error || !orderId) {
+    //         Alert.alert('Error', 'Order creation failed. Please try again.');
+    //         setLoading(false);
+    //         return;
+    //     }
+
+    //     clearCart();
+    //     setLoading(false);
+
+    // router.replace(`/(customer)/tracking/${orderId}`);
+    // };
+
     const handleCreateOrder = async (reference: string) => {
-        setLoading(true);
+    setLoading(true);
 
-        const { orderId, error } = await createOrder({
-            customer_id: profile!.id,
-            restaurant_id: params.restaurantId,
-            items: items.map(({ menuItem, quantity }) => ({
-                menu_item_id: menuItem.id,
-                quantity,
-                unit_price: menuItem.price,
-            })),
-            total_amount: total,
-            delivery_fee: deliveryFee,
-            delivery_address: params.address,
-            delivery_lat: parseFloat(params.deliveryLat),
-            delivery_lng: parseFloat(params.deliveryLng),
-            payment_reference: reference,
-        });
+    const { orderId, error } = await createOrder({
+        customer_id: profile!.id,
+        restaurant_id: params.restaurantId,
+        items: items.map(({ menuItem, quantity }) => ({
+            menu_item_id: menuItem.id,
+            quantity,
+            unit_price: menuItem.price,
+        })),
+        total_amount: total,
+        delivery_fee: deliveryFee,
+        delivery_address: params.address,
+        delivery_lat: parseFloat(params.deliveryLat),
+        delivery_lng: parseFloat(params.deliveryLng),
+        payment_reference: reference,
+    });
 
-        if (error || !orderId) {
-            Alert.alert('Error', 'Order creation failed. Please try again.');
-            setLoading(false);
-            return;
-        }
-
-        clearCart();
+    if (error || !orderId) {
+        Alert.alert('Error', 'Order creation failed. Please try again.');
         setLoading(false);
+        return;
+    }
 
-        // router.replace({
-        //     pathname: '/(customer)/tracking/[orderId]',
-        //     params: { orderId },
-        // });
+    const SIMULATED_DRIVER_ID = '9b1a9bee-6fca-4384-967d-1907e2bfc29d';
+
+    const restaurantLat = parseFloat(params.restaurantLat ?? '6.5244');
+    const restaurantLng = parseFloat(params.restaurantLng ?? '3.3792');
+
+    await ensureSimulatedDriver(SIMULATED_DRIVER_ID, {
+        lat: restaurantLat,
+        lng: restaurantLng,
+    });
+
+    startDeliverySimulation({
+        orderId,
+        driverId: SIMULATED_DRIVER_ID,
+        restaurantCoords: { lat: restaurantLat, lng: restaurantLng },
+        deliveryCoords: {
+            lat: parseFloat(params.deliveryLat),
+            lng: parseFloat(params.deliveryLng),
+        },
+    });
+
+    clearCart();
+    setLoading(false);
     router.replace(`/(customer)/tracking/${orderId}`);
-    };
+};
+
 
 
     const handlePayWeb = () => {

@@ -6,13 +6,17 @@ interface CartState {
     items: CartItem[];
     restaurantId: string | null;
     restaurantName: string | null;
+    restaurantLat: number | null;
+    restaurantLng: number | null;
 
     // Actions
     addItem: (
-        menuItem: MenuItem, 
-        restaurantId: string, 
-        restaurantName: string) 
-        => void;
+        menuItem: MenuItem,
+        restaurantId: string,
+        restaurantName: string,
+        restaurantLat: number,
+        restaurantLng: number,
+    ) => void;
     removeItem: (menuItemId: string) => void;
     incrementItem: (menuItemId: string) => void;
     decrementItem: (menuItemId: string) => void;
@@ -25,26 +29,28 @@ interface CartState {
 }
 
 const useCartStore = create<CartState>((set, get) => ({
-    // Initial state
     items: [],
     restaurantId: null,
     restaurantName: null,
+    restaurantLat: null,
+    restaurantLng: null,
 
-    // Add item — if from different restaurant, clear cart first
-    addItem: (menuItem, restaurantId, restaurantName) => {
+    addItem: (menuItem, restaurantId, restaurantName, restaurantLat, restaurantLng) => {
         const { items, restaurantId: currentRestaurantId } = get();
 
-        // If adding from a different restaurant, start fresh
+        // Different restaurant — clear cart and start fresh
         if (currentRestaurantId && currentRestaurantId !== restaurantId) {
             set({
                 items: [{ menuItem, quantity: 1 }],
                 restaurantId,
                 restaurantName,
+                restaurantLat,
+                restaurantLng,
             });
             return;
         }
 
-        // If item already in cart, increment quantity
+        // Same item already in cart — increment
         const existingItem = items.find(i => i.menuItem.id === menuItem.id);
         if (existingItem) {
             set({
@@ -62,6 +68,8 @@ const useCartStore = create<CartState>((set, get) => ({
             items: [...items, { menuItem, quantity: 1 }],
             restaurantId,
             restaurantName,
+            restaurantLat,
+            restaurantLng,
         });
     },
 
@@ -72,6 +80,8 @@ const useCartStore = create<CartState>((set, get) => ({
             items: updated,
             restaurantId: updated.length === 0 ? null : get().restaurantId,
             restaurantName: updated.length === 0 ? null : get().restaurantName,
+            restaurantLat: updated.length === 0 ? null : get().restaurantLat,
+            restaurantLng: updated.length === 0 ? null : get().restaurantLng,
         });
     },
 
@@ -90,7 +100,6 @@ const useCartStore = create<CartState>((set, get) => ({
         const item = items.find(i => i.menuItem.id === menuItemId);
         if (!item) return;
 
-        // If quantity is 1, remove the item entirely
         if (item.quantity === 1) {
             get().removeItem(menuItemId);
             return;
@@ -109,19 +118,14 @@ const useCartStore = create<CartState>((set, get) => ({
         items: [],
         restaurantId: null,
         restaurantName: null,
+        restaurantLat: null,
+        restaurantLng: null,
     }),
 
-    // Computed helpers — these use get() to read current state
-    getTotalItems: () => {
-        return get().items.reduce((sum, item) => sum + item.quantity, 0);
-    },
+    getTotalItems: () => get().items.reduce((sum, item) => sum + item.quantity, 0),
 
-    getTotalPrice: () => {
-        return get().items.reduce(
-            (sum, item) => sum + item.menuItem.price * item.quantity,
-            0
-        );
-    },
+    getTotalPrice: () =>
+        get().items.reduce((sum, item) => sum + item.menuItem.price * item.quantity, 0),
 
     getItemQuantity: (menuItemId) => {
         const item = get().items.find(i => i.menuItem.id === menuItemId);

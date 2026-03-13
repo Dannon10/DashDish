@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
+
 import { MenuItem as MenuItemType } from '../../types/restaurant.types';
 import useCartStore from '../../store/useCartStore';
 import formatCurrency from '../../utils/formatCurrency';
@@ -11,15 +12,23 @@ interface Props {
     item: MenuItemType;
     restaurantId: string;
     restaurantName: string;
+    restaurantLat: number;
+    restaurantLng: number;
 }
 
-export default function MenuItem({ item, restaurantId, restaurantName }: Props) {
+export default function MenuItem({
+    item,
+    restaurantId,
+    restaurantName,
+    restaurantLat,
+    restaurantLng,
+}: Props) {
     const { addItem, incrementItem, decrementItem, getItemQuantity } = useCartStore();
     const quantity = getItemQuantity(item.id);
 
     return (
         <View style={tw`flex-row items-center py-4 border-b border-[#1E1E1E]`}>
-            {/* Item Info */}
+            {/* Item info */}
             <View style={tw`flex-1 mr-4`}>
                 <Text style={tw`text-white font-semibold text-base mb-1`}>
                     {item.name}
@@ -34,9 +43,8 @@ export default function MenuItem({ item, restaurantId, restaurantName }: Props) 
                 </Text>
             </View>
 
-            {/* Item Image + Add Button */}
+            {/* Image + quantity controls */}
             <View style={tw`items-center`}>
-                {/* Image */}
                 <View style={tw`w-35 h-30 rounded-xl bg-[#1E1E1E] items-center justify-center mb-2 overflow-hidden`}>
                     {item.image_url ? (
                         <Image
@@ -49,11 +57,12 @@ export default function MenuItem({ item, restaurantId, restaurantName }: Props) 
                     )}
                 </View>
 
-                {/* Quantity Controls */}
                 {quantity === 0 ? (
                     <TouchableOpacity
                         style={tw`bg-[#7C3AED] px-4 py-1.5 rounded-full`}
-                        onPress={() => addItem(item, restaurantId, restaurantName)}
+                        onPress={() =>
+                            addItem(item, restaurantId, restaurantName, restaurantLat, restaurantLng)
+                        }
                     >
                         <Text style={tw`text-white font-semibold text-sm`}>Add</Text>
                     </TouchableOpacity>
