@@ -11,7 +11,6 @@ import {
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
 import useCartStore from '../../store/useCartStore';
 import useAuthStore from '../../store/useAuthStore';
 import formatCurrency from '../../utils/formatCurrency';
@@ -19,16 +18,22 @@ import calculateFare from '../../utils/calculateFare';
 import { forwardGeocode } from '../../services/mapbox.service';
 import colors from '../../constants/colors';
 
-// Fallback delivery coords (Victoria Island, Lagos) if geocoding fails
+// Fallback delivery coords
 const FALLBACK_LAT = 6.4281;
 const FALLBACK_LNG = 3.4219;
 const DEMO_DISTANCE_KM = 3.5;
 
 export default function CheckoutScreen() {
-    const { items, restaurantName, restaurantId, restaurantLat, restaurantLng, getTotalPrice } =
-        useCartStore();
+    const {
+        items,
+        restaurantName,
+        restaurantId,
+        restaurantLat,
+        restaurantLng,
+        getTotalPrice
+    } = useCartStore();
     const { profile } = useAuthStore();
-
+    const savedAddress = (profile as any)?.address ?? '';
     const [address, setAddress] = useState('');
     const [addressError, setAddressError] = useState<string | null>(null);
     const [geocoding, setGeocoding] = useState(false);
@@ -86,11 +91,11 @@ export default function CheckoutScreen() {
     };
 
     useEffect(() => {
-    if (items.length === 0) {
-        router.replace('/(customer)/(tabs)/');
-        // router.replace('/(customer)/cart');
-    }
-}, [items.length]);
+        if (items.length === 0) {
+            router.replace('/(customer)/order');
+            // router.replace('/(customer)/cart');
+        }
+    }, [items.length]);
 
     return (
         <View style={tw`flex-1 bg-[#0A0A0A]`}>
@@ -111,10 +116,9 @@ export default function CheckoutScreen() {
                     <Text style={tw`text-white font-bold text-lg mb-4`}>
                         Delivery Address
                     </Text>
+
                     <View
-                        style={tw`bg-[#141414] border ${
-                            addressError ? 'border-red-500' : 'border-[#2A2A2A]'
-                        } rounded-xl p-4`}
+                        style={tw`bg-[#141414] border ${addressError ? 'border-red-500' : 'border-[#2A2A2A]'} rounded-xl p-4`}
                     >
                         <View style={tw`flex-row items-start gap-3`}>
                             <Ionicons
@@ -136,7 +140,30 @@ export default function CheckoutScreen() {
                                 numberOfLines={3}
                             />
                         </View>
+
+                        {savedAddress ? (
+                            <TouchableOpacity
+                                onPress={() => { setAddress(savedAddress); setAddressError(null); }}
+                                style={tw`flex-row items-center gap-1.5 mt-3 self-start bg-[${colors.primary}22] px-3 py-1.5 rounded-full`}
+                            >
+                                <Ionicons name="location" size={12} color={colors.primary} />
+                                <Text style={[tw`text-xs font-semibold`, { color: colors.primary }]}>
+                                    Use saved address
+                                </Text>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                onPress={() => router.push('/(customer)/(tabs)/profile')}
+                                style={tw`flex-row items-center gap-1.5 mt-3 self-start`}
+                            >
+                                <Text style={tw`text-[${colors.textMuted}] text-xs`}>No saved address —</Text>
+                                <Text style={[tw`text-xs font-semibold`, { color: colors.primary }]}>
+                                    add one in profile →
+                                </Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
+
                     {addressError && (
                         <Text style={tw`text-red-400 text-xs mt-2 ml-1`}>{addressError}</Text>
                     )}
@@ -154,9 +181,8 @@ export default function CheckoutScreen() {
                         {items.map(({ menuItem, quantity }, index) => (
                             <View
                                 key={menuItem.id}
-                                style={tw`flex-row items-center justify-between px-4 py-3 ${
-                                    index < items.length - 1 ? 'border-b border-[#1E1E1E]' : ''
-                                }`}
+                                style={tw`flex-row items-center justify-between px-4 py-3 ${index < items.length - 1 ? 'border-b border-[#1E1E1E]' : ''
+                                    }`}
                             >
                                 <View style={tw`flex-row items-center gap-3 flex-1`}>
                                     <View
@@ -205,9 +231,8 @@ export default function CheckoutScreen() {
             {/* Proceed button */}
             <View style={tw`px-5 pb-8 pt-4 bg-[#0A0A0A] border-t border-[#1E1E1E]`}>
                 <TouchableOpacity
-                    style={tw`bg-[#7C3AED] py-4 rounded-xl items-center flex-row justify-center gap-2 ${
-                        geocoding ? 'opacity-70' : ''
-                    }`}
+                    style={tw`bg-[#7C3AED] py-4 rounded-xl items-center flex-row justify-center gap-2 ${geocoding ? 'opacity-70' : ''
+                        }`}
                     onPress={handleProceedToPayment}
                     disabled={geocoding}
                 >
