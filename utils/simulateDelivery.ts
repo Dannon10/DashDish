@@ -1,7 +1,7 @@
 import { supabase } from '../services/supabase';
 import { OrderStatus } from '../types/database.types';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// Types
 interface Coords {
     lat: number;
     lng: number;
@@ -17,7 +17,7 @@ interface SimulationOptions {
     onComplete?: () => void;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// Helpers
 
 function interpolate(from: Coords, to: Coords, t: number): Coords {
     return {
@@ -79,14 +79,6 @@ async function isOrderStillUnassigned(orderId: string): Promise<boolean> {
     return !data?.driver_id;
 }
 
-// ─── Main simulation ──────────────────────────────────────────────────────────
-/**
- * Simulates the full delivery lifecycle.
- * IMPORTANT: Does NOT assign driver_id immediately on call.
- * Call this inside a setTimeout from payment.tsx to give the driver
- * a window to accept the order first.
- * Only assigns driver_id + confirms if order is still unassigned when it runs.
- */
 export function startDeliverySimulation(options: SimulationOptions): () => void {
     const {
         orderId,
@@ -107,8 +99,6 @@ export function startDeliverySimulation(options: SimulationOptions): () => void 
             const stillUnassigned = await isOrderStillUnassigned(orderId);
             if (!stillUnassigned || cancelled()) return;
 
-            // Assign simulated driver + set confirmed in one atomic update
-            // .is('driver_id', null) ensures we don't overwrite a real driver
             await supabase
                 .from('orders')
                 .update({
@@ -183,7 +173,7 @@ export function startDeliverySimulation(options: SimulationOptions): () => void 
     return () => { isCancelled = true; };
 }
 
-// ─── Ensure simulated driver row exists ───────────────────────────────────────
+// Ensure simulated driver row exists
 export async function ensureSimulatedDriver(
     driverId: string,
     startCoords: Coords

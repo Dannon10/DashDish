@@ -86,13 +86,19 @@ export default function CartScreen() {
                                         resizeMode="cover"
                                     />
                                 ) : (
-                                    <Ionicons name="fast-food-outline" size={24} color={colors.textMuted} />
+                                    <Ionicons 
+                                        name="fast-food-outline" 
+                                        size={24} 
+                                        color={colors.textMuted} 
+                                    />
                                 )}
                             </View>
 
                             {/* Item Details */}
                             <View style={tw`flex-1`}>
-                                <Text style={tw`text-white font-semibold text-base`} numberOfLines={1}>
+                                <Text 
+                                style={tw`text-white font-semibold text-base`} 
+                                numberOfLines={1}>
                                     {menuItem.name}
                                 </Text>
                                 <Text style={tw`text-[#7C3AED] font-bold text-sm mt-1`}>
@@ -111,7 +117,11 @@ export default function CartScreen() {
                                     style={tw`w-8 h-8 bg-[#1E1E1E] rounded-full items-center justify-center`}
                                     onPress={() => decrementItem(menuItem.id)}
                                 >
-                                    <Ionicons name="remove" size={16} color="white" />
+                                    <Ionicons 
+                                        name="remove" 
+                                        size={16} 
+                                        color="white" 
+                                    />
                                 </TouchableOpacity>
                                 <Text style={tw`text-white font-bold text-base w-4 text-center`}>
                                     {quantity}

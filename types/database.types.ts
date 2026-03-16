@@ -19,6 +19,8 @@ export interface Database {
                     phone: string | null;
                     avatar_url: string | null;
                     role: UserRole;
+                    address: string | null;
+                    vehicle_info: string | null;
                     created_at: string;
                 };
                 Insert: {
@@ -27,13 +29,16 @@ export interface Database {
                     phone?: string | null;
                     avatar_url?: string | null;
                     role: UserRole;
+                    address?: string | null;
+                    vehicle_info?: string | null;
                     created_at?: string;
                 };
                 Update: {
                     full_name?: string;
                     phone?: string | null;
                     avatar_url?: string | null;
-                    role?: UserRole;
+                    address?: string | null;
+                    vehicle_info?: string | null;
                 };
             };
             restaurants: {
@@ -207,8 +212,6 @@ export interface Database {
     };
 }
 
-
-// Add this at the bottom of database.types.ts
 export type Tables<T extends keyof Database['public']['Tables']> =
     Database['public']['Tables'][T]['Row'];
 

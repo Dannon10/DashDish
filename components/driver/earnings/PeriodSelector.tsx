@@ -6,7 +6,7 @@ import colors from '../../../constants/colors';
 export type Period = 'week' | 'month' | 'all';
 
 const LABELS: Record<Period, string> = {
-    week: 'This Week',
+    week: 'Week',
     month: 'This Month',
     all: 'All Time',
 };

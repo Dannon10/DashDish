@@ -16,7 +16,7 @@ interface Props {
     onDecline: () => void;
     isSimulated?: boolean;
     isLoading?: boolean;
-    noMargin?: boolean; // skip mx-5 mb-4 when wrapped in SwipeableCard
+    noMargin?: boolean; 
 }
 
 export default function RequestCard({
