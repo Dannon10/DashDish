@@ -17,9 +17,8 @@ interface SimulationOptions {
     onComplete?: () => void;
 }
 
-// ─── Helpers
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
-// Interpolate between two coords by fraction t (0→1)
 function interpolate(from: Coords, to: Coords, t: number): Coords {
     return {
         lat: from.lat + (to.lat - from.lat) * t,
@@ -27,7 +26,6 @@ function interpolate(from: Coords, to: Coords, t: number): Coords {
     };
 }
 
-// Small random offset so simulated driver doesn't start exactly on restaurant
 function jitter(coords: Coords, amount = 0.003): Coords {
     return {
         lat: coords.lat + (Math.random() - 0.5) * amount,
@@ -39,7 +37,6 @@ function sleep(ms: number): Promise<void> {
     return new Promise((res) => setTimeout(res, ms));
 }
 
-// ─── Update driver location in Supabase ──────────────────────────────────────
 async function updateDriverLocation(driverId: string, coords: Coords) {
     await supabase
         .from('driver_locations')
@@ -47,18 +44,13 @@ async function updateDriverLocation(driverId: string, coords: Coords) {
         .eq('driver_id', driverId);
 }
 
-// ─── Update order status in Supabase ─────────────────────────────────────────
-async function updateOrderStatus(
-    orderId: string,
-    status: OrderStatus,
-    driverId?: string
-) {
-    const updates: any = { status, updated_at: new Date().toISOString() };
-    if (driverId) updates.driver_id = driverId;
-    await supabase.from('orders').update(updates).eq('id', orderId);
+async function updateOrderStatus(orderId: string, status: OrderStatus) {
+    await supabase
+        .from('orders')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', orderId);
 }
 
-// ─── Move driver along a path ─────────────────────────────────────────────────
 async function animatePath(
     driverId: string,
     from: Coords,
@@ -70,21 +62,30 @@ async function animatePath(
 ) {
     for (let i = 1; i <= steps; i++) {
         if (cancelled?.()) return;
-        const t = i / steps;
-        const coords = interpolate(from, to, t);
+        const coords = interpolate(from, to, i / steps);
         await updateDriverLocation(driverId, coords);
         onLocationUpdate?.(coords);
         await sleep(intervalMs);
     }
 }
 
+// Returns true if no real driver has accepted yet
+async function isOrderStillUnassigned(orderId: string): Promise<boolean> {
+    const { data } = await supabase
+        .from('orders')
+        .select('driver_id')
+        .eq('id', orderId)
+        .maybeSingle();
+    return !data?.driver_id;
+}
+
 // ─── Main simulation ──────────────────────────────────────────────────────────
 /**
- * Simulates the full delivery lifecycle:
- * placed → confirmed → preparing → picked_up → on_the_way → delivered
- *
- * Returns a cancel function — call it to abort the simulation early
- * (e.g. when a real driver accepts the order instead).
+ * Simulates the full delivery lifecycle.
+ * IMPORTANT: Does NOT assign driver_id immediately on call.
+ * Call this inside a setTimeout from payment.tsx to give the driver
+ * a window to accept the order first.
+ * Only assigns driver_id + confirms if order is still unassigned when it runs.
  */
 export function startDeliverySimulation(options: SimulationOptions): () => void {
     const {
@@ -102,19 +103,31 @@ export function startDeliverySimulation(options: SimulationOptions): () => void 
 
     async function run() {
         try {
-            // ── Phase 1: confirmed (2s after placed) ──────────────────────────
-            await sleep(2000);
-            if (cancelled()) return;
-            await updateOrderStatus(orderId, 'confirmed', driverId);
+            // Guard: bail if a real driver already accepted
+            const stillUnassigned = await isOrderStillUnassigned(orderId);
+            if (!stillUnassigned || cancelled()) return;
+
+            // Assign simulated driver + set confirmed in one atomic update
+            // .is('driver_id', null) ensures we don't overwrite a real driver
+            await supabase
+                .from('orders')
+                .update({
+                    driver_id: driverId,
+                    status: 'confirmed',
+                    updated_at: new Date().toISOString(),
+                })
+                .eq('id', orderId)
+                .is('driver_id', null);
+
             onStatusChange?.('confirmed');
 
-            // ── Phase 2: preparing (restaurant is cooking — 5s) ───────────────
+            // Phase 2: preparing
             await sleep(5000);
             if (cancelled()) return;
             await updateOrderStatus(orderId, 'preparing');
             onStatusChange?.('preparing');
 
-            // ── Phase 3: driver moves toward restaurant ───────────────────────
+            // Phase 3: driver moves toward restaurant
             const driverStart = jitter(restaurantCoords, 0.008);
             await updateDriverLocation(driverId, driverStart);
             onLocationUpdate?.(driverStart);
@@ -123,20 +136,20 @@ export function startDeliverySimulation(options: SimulationOptions): () => void 
                 driverId,
                 driverStart,
                 restaurantCoords,
-                12,       // steps
-                1500,     // ms per step (~18s total)
+                12,
+                1500,
                 onLocationUpdate,
                 cancelled
             );
             if (cancelled()) return;
 
-            // ── Phase 4: picked_up ────────────────────────────────────────────
+            // Phase 4: picked_up
             await updateOrderStatus(orderId, 'picked_up');
             onStatusChange?.('picked_up');
             await sleep(1500);
             if (cancelled()) return;
 
-            // ── Phase 5: on_the_way — driver moves to delivery address ────────
+            // Phase 5: on_the_way
             await updateOrderStatus(orderId, 'on_the_way');
             onStatusChange?.('on_the_way');
 
@@ -144,18 +157,17 @@ export function startDeliverySimulation(options: SimulationOptions): () => void 
                 driverId,
                 restaurantCoords,
                 deliveryCoords,
-                20,       // steps
-                2000,     // ms per step (~40s total)
+                20,
+                2000,
                 onLocationUpdate,
                 cancelled
             );
             if (cancelled()) return;
 
-            // ── Phase 6: delivered ────────────────────────────────────────────
+            // Phase 6: delivered
             await updateOrderStatus(orderId, 'delivered');
             onStatusChange?.('delivered');
 
-            // Mark driver back online/available
             await supabase
                 .from('driver_locations')
                 .update({ is_online: true })
@@ -168,17 +180,10 @@ export function startDeliverySimulation(options: SimulationOptions): () => void 
     }
 
     run();
-
-    return () => {
-        isCancelled = true;
-    };
+    return () => { isCancelled = true; };
 }
 
-// ─── Ensure simulated driver exists in driver_locations ──────────────────────
-/**
- * Call this when an order is placed to make sure the simulated
- * driver has a row in driver_locations to update.
- */
+// ─── Ensure simulated driver row exists ───────────────────────────────────────
 export async function ensureSimulatedDriver(
     driverId: string,
     startCoords: Coords
@@ -187,7 +192,7 @@ export async function ensureSimulatedDriver(
         .from('driver_locations')
         .select('id')
         .eq('driver_id', driverId)
-        .single();
+        .maybeSingle();
 
     if (!data) {
         await supabase.from('driver_locations').insert({

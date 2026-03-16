@@ -1,69 +1,49 @@
 import React from 'react';
-import { 
+import {
     View,
     Text,
     Platform,
-    StyleSheet,
-    TouchableOpacity
+    TouchableOpacity,
 } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import tw from 'twrnc';
-import useCartStore from '../../../store/useCartStore';
 import colors from '../../../constants/colors';
 
-// Cart badge icon 
-function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
-    const totalItems = useCartStore((s) => s.getTotalItems());
-
-    return (
-        <View style={tw`items-center justify-center`}>
-            <Ionicons 
-            name={focused ? 'bag' : 'bag-outline'} 
-            size={24} 
-            color={color} 
-            />
-            {totalItems > 0 && (
-                <View
-                    style={[
-                        tw`absolute -top-1 -right-2 min-w-[16px] h-4 rounded-full items-center justify-center px-1`,
-                        { backgroundColor: colors.primary },
-                    ]}
-                >
-                    <Text style={tw`text-white text-[10px] font-bold`}>
-                        {totalItems > 99 ? '99+' : totalItems}
-                    </Text>
-                </View>
-            )}
-        </View>
-    );
-}
-
-// Generic tab icon 
 function TabIcon({ name, focusedName, color, focused }: {
     name: any;
     focusedName: any;
     color: string;
     focused: boolean;
 }) {
-    return <Ionicons 
-    name={focused ? focusedName : name} 
-    size={24} 
-    color={color} 
-    />;
+    return <Ionicons name={focused ? focusedName : name} size={24} color={color} />;
 }
 
-// Custom glass tab bar
 function GlassTabBar({ state, descriptors, navigation }: any) {
-    return (
-        <View style={styles.outerContainer} pointerEvents="box-none">
-            <View style={styles.glassWrapper}>
-                <BlurView intensity={60} tint="dark" style={StyleSheet.absoluteFill} />
-                <View style={styles.frostedOverlay} />
-                <View style={styles.borderOverlay} />
+    const bottomMargin = Platform.OS === 'ios' ? 34 : 16;
 
-                <View style={styles.tabRow}>
+    return (
+        <View
+            style={[
+                tw`absolute left-5 right-5 h-[68px] z-50`,
+                {
+                    bottom: bottomMargin,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.4,
+                    shadowRadius: 24,
+                    elevation: 16,
+                },
+            ]}
+            pointerEvents="box-none"
+        >
+            <View style={tw`flex-1 rounded-[30px] overflow-hidden`}>
+                <BlurView intensity={60} tint="dark" style={tw`absolute inset-0`} />
+                <View style={[tw`absolute inset-0`, { backgroundColor: 'rgba(18, 18, 18, 0.60)' }]} />
+                <View style={[tw`absolute inset-0 rounded-[30px]`, { borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.09)' }]} />
+
+                <View style={tw`flex-1 flex-row items-center px-1.5`}>
                     {state.routes.map((route: any, index: number) => {
                         const { options } = descriptors[route.key];
                         if (options.href === null) return null;
@@ -88,17 +68,19 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
                                 key={route.key}
                                 onPress={onPress}
                                 activeOpacity={0.7}
-                                style={styles.tabItem}
+                                style={tw`flex-1 items-center justify-center pt-1.5`}
                             >
-                                {isFocused && <View style={styles.activePill} />}
-                                <View 
-                                style={[styles.tabInner, isFocused && styles.tabInnerFocused]}>
+                                {isFocused && (
+                                    <View style={[tw`absolute top-0 w-7 rounded-sm`, { height: 2.5, backgroundColor: colors.primary }]} />
+                                )}
+                                <View style={[
+                                    tw`items-center justify-center py-1.5 px-3.5 rounded-[18px] gap-0.5`,
+                                    isFocused && { backgroundColor: `${colors.primary}18` },
+                                ]}>
                                     {options.tabBarIcon?.({ color, focused: isFocused, size: 24 })}
-                                    <Text 
-                                    style={[styles.tabLabel, 
-                                    { color }]}>
+                                    <Text style={[tw`text-[10px] font-semibold tracking-wide`, { color }]}>
                                         {label}
-                                        </Text>
+                                    </Text>
                                 </View>
                             </TouchableOpacity>
                         );
@@ -109,82 +91,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
     );
 }
 
-// Styles
-const TAB_HEIGHT = 68;
-const BOTTOM_MARGIN = Platform.OS === 'ios' ? 34 : 16;
-const SIDE_MARGIN = 20;
-const BORDER_RADIUS = 30;
-
-const styles = StyleSheet.create({
-    outerContainer: {
-        position: 'absolute',
-        bottom: BOTTOM_MARGIN,
-        left: SIDE_MARGIN,
-        right: SIDE_MARGIN,
-        height: TAB_HEIGHT,
-        zIndex: 100,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.4,
-        shadowRadius: 24,
-        elevation: 16,
-    },
-    glassWrapper: {
-        flex: 1,
-        borderRadius: BORDER_RADIUS,
-        overflow: 'hidden',
-    },
-    frostedOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(18, 18, 18, 0.60)',
-    },
-    borderOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        borderRadius: BORDER_RADIUS,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.09)',
-    },
-    tabRow: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 6,
-    },
-    tabItem: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
-        paddingTop: 6,
-    },
-    activePill: {
-        position: 'absolute',
-        top: 0,
-        width: 28,
-        height: 2.5,
-        borderRadius: 2,
-        backgroundColor: colors.primary,
-    },
-    tabInner: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 6,
-        paddingHorizontal: 14,
-        borderRadius: 18,
-        gap: 3,
-    },
-    tabInnerFocused: {
-        backgroundColor: `${colors.primary}18`,
-    },
-    tabLabel: {
-        fontSize: 10,
-        fontWeight: '600',
-        letterSpacing: 0.2,
-    },
-});
-
-// Layout 
-export default function TabsLayout() {
+export default function DriverTabsLayout() {
     return (
         <Tabs
             tabBar={(props) => <GlassTabBar {...props} />}
@@ -195,38 +102,16 @@ export default function TabsLayout() {
                 options={{
                     title: 'Home',
                     tabBarIcon: ({ color, focused }) => (
-                        <TabIcon 
-                        name="home-outline" 
-                        focusedName="home" 
-                        color={color} 
-                        focused={focused} 
-                        />
+                        <TabIcon name="bicycle-outline" focusedName="bicycle" color={color} focused={focused} />
                     ),
                 }}
             />
             <Tabs.Screen
-                name="orders"
+                name="earnings"
                 options={{
-                    title: 'Orders',
+                    title: 'Earnings',
                     tabBarIcon: ({ color, focused }) => (
-                        <TabIcon 
-                        name="receipt-outline" 
-                        focusedName="receipt" 
-                        color={color} 
-                        focused={focused} 
-                        />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="cart"
-                options={{
-                    title: 'Cart',
-                    tabBarIcon: ({ color, focused }) => (
-                        <CartTabIcon 
-                        color={color} 
-                        focused={focused} 
-                        />
+                        <TabIcon name="wallet-outline" focusedName="wallet" color={color} focused={focused} />
                     ),
                 }}
             />
@@ -235,12 +120,7 @@ export default function TabsLayout() {
                 options={{
                     title: 'Profile',
                     tabBarIcon: ({ color, focused }) => (
-                        <TabIcon 
-                        name="person-outline" 
-                        focusedName="person" 
-                        color={color} 
-                        focused={focused} 
-                        />
+                        <TabIcon name="person-outline" focusedName="person" color={color} focused={focused} />
                     ),
                 }}
             />

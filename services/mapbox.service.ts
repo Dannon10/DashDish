@@ -27,6 +27,17 @@ export async function getRoute(
     origin: Coordinates,
     destination: Coordinates
 ): Promise<RouteResult | null> {
+    // Guard: reject invalid or zero coordinates
+    if (
+        !origin?.lat || !origin?.lng ||
+        !destination?.lat || !destination?.lng ||
+        isNaN(origin.lat) || isNaN(origin.lng) ||
+        isNaN(destination.lat) || isNaN(destination.lng)
+    ) {
+        console.warn('[mapbox] getRoute skipped — invalid coordinates', { origin, destination });
+        return null;
+    }
+
     try {
         const url =
             `${DIRECTIONS_BASE}/` +

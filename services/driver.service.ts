@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 import { OrderWithItems } from '../types/order.types';
 import { DriverLocation } from '../types/driver.types';
 
-// ─── Get pending orders (available for drivers to accept) ────────────────────
+// Get pending orders (available for drivers to accept)
 export async function getPendingOrders(): Promise<{
     data: OrderWithItems[];
     error: string | null;
@@ -22,7 +22,7 @@ export async function getPendingOrders(): Promise<{
     return { data: data as OrderWithItems[], error: null };
 }
 
-// ─── Accept an order as a driver ─────────────────────────────────────────────
+// Accept an order as a driver
 export async function acceptOrder(
     orderId: string,
     driverId: string
@@ -41,10 +41,10 @@ export async function acceptOrder(
     return { error: null };
 }
 
-// ─── Decline / ignore an order (no DB change needed, just UI) ────────────────
+// Decline / ignore an order (no DB change needed, just UI)
 // Real decline logic could insert into a 'declined_orders' table if needed
 
-// ─── Update order status as driver ───────────────────────────────────────────
+// Update order status as driver
 export async function updateDeliveryStatus(
     orderId: string,
     status: 'picked_up' | 'on_the_way' | 'delivered'
@@ -58,7 +58,7 @@ export async function updateDeliveryStatus(
     return { error: null };
 }
 
-// ─── Upsert driver location ───────────────────────────────────────────────────
+// Upsert driver location
 export async function upsertDriverLocation(
     driverId: string,
     lat: number,
@@ -87,7 +87,7 @@ export async function upsertDriverLocation(
     return { error: null };
 }
 
-// ─── Get driver's active delivery ────────────────────────────────────────────
+// Get driver's active delivery 
 export async function getActiveDelivery(
     driverId: string
 ): Promise<{ data: OrderWithItems | null; error: string | null }> {
@@ -108,7 +108,7 @@ export async function getActiveDelivery(
     return { data: data as OrderWithItems, error: null };
 }
 
-// ─── Get driver earnings ──────────────────────────────────────────────────────
+// Get driver earnings 
 export async function getDriverEarnings(
     driverId: string
 ): Promise<{ total: number; today: number; error: string | null }> {

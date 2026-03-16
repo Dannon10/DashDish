@@ -11,11 +11,11 @@ export default function DriverLayout() {
                 animation: 'slide_from_right',
             }}
         >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="active" />
-            <Stack.Screen name="earnings" />
-            <Stack.Screen name="profile" />
-            <Stack.Screen name="request" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen
+                name="active"
+                options={{ animation: 'slide_from_bottom' }}
+            />
         </Stack>
     );
 }

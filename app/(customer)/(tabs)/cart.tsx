@@ -50,7 +50,7 @@ export default function CartScreen() {
     }
 
     return (
-        <View style={tw`flex-1 bg-[#0A0A0A]`}>
+        <View style={tw`flex-1 bg-[#0A0A0A] pb-16`}>
 
             {/* Header */}
             <View style={tw`px-5 pt-14 pb-4 flex-row items-center justify-between`}>
