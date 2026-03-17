@@ -1,17 +1,9 @@
 import React from "react";
-import {
-    View,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    ActivityIndicator,
-    Image,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
 import { getRestaurantWithMenu } from '../../../services/restaurant.service';
 import { RestaurantWithMenu } from '../../../types/restaurant.types';
 import MenuCategory from '../../../components/restaurant/MenuCategory';

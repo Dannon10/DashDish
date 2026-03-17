@@ -62,57 +62,6 @@ export default function PaymentScreen() {
         };
     }, []);
 
-//     const handleCreateOrder = async (reference: string) => {
-//     setLoading(true);
-
-//     const { orderId, error } = await createOrder({
-//         customer_id: profile!.id,
-//         restaurant_id: params.restaurantId,
-//         items: items.map(({ menuItem, quantity }) => ({
-//             menu_item_id: menuItem.id,
-//             quantity,
-//             unit_price: menuItem.price,
-//         })),
-//         total_amount: total,
-//         delivery_fee: deliveryFee,
-//         delivery_address: params.address,
-//         delivery_lat: parseFloat(params.deliveryLat),
-//         delivery_lng: parseFloat(params.deliveryLng),
-//         payment_reference: reference,
-//     });
-
-//     if (error || !orderId) {
-//         Alert.alert('Error', 'Order creation failed. Please try again.');
-//         setLoading(false);
-//         return;
-//     }
-
-//     const SIMULATED_DRIVER_ID = '9b1a9bee-6fca-4384-967d-1907e2bfc29d';
-
-//     const restaurantLat = parseFloat(params.restaurantLat ?? '6.5244');
-//     const restaurantLng = parseFloat(params.restaurantLng ?? '3.3792');
-
-//     await ensureSimulatedDriver(SIMULATED_DRIVER_ID, {
-//         lat: restaurantLat,
-//         lng: restaurantLng,
-//     });
-
-//     startDeliverySimulation({
-//         orderId,
-//         driverId: SIMULATED_DRIVER_ID,
-//         restaurantCoords: { lat: restaurantLat, lng: restaurantLng },
-//         deliveryCoords: {
-//             lat: parseFloat(params.deliveryLat),
-//             lng: parseFloat(params.deliveryLng),
-//         },
-//     });
-
-//     clearCart();
-//     setLoading(false);
-//     router.replace(`/(customer)/tracking/${orderId}`);
-// };
-
-
 const handleCreateOrder = async (reference: string) => {
         setLoading(true);
 
@@ -161,7 +110,7 @@ const handleCreateOrder = async (reference: string) => {
                     lng: parseFloat(params.deliveryLng),
                 },
             });
-        }, 10000); // 10 second window for driver to accept
+        }, 10000);
 
         clearCart();
         setLoading(false);

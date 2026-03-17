@@ -12,35 +12,31 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import tw from 'twrnc';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../services/supabase';
-import {
-    getRoute,
-    subscribeToDriverLocation,
-    getDriverLocation,
-    formatETA,
-    formatDistance,
-    RouteResult,
-    Coordinates,
+import { 
+    getRoute, 
+    subscribeToDriverLocation, 
+    getDriverLocation, 
+    formatETA, 
+    formatDistance, 
+    RouteResult, 
+    Coordinates
 } from '../../../services/mapbox.service';
 import { useOrder } from '../../../hooks/useOrder';
 import { useSmoothedLocation } from '../../../hooks/useSmoothedLocation';
 import useOrderStore from '../../../store/useOrderStore';
+import DeliveryMap from '../../../components/maps/DeliveryMap';
 import colors from '../../../constants/colors';
 import type { DriverLocation } from '../../../types/driver.types';
 import type { OrderStatus } from '../../../types/database.types';
 
 const SIMULATED_DRIVER_ID = '9b1a9bee-6fca-4384-967d-1907e2bfc29d';
 
-let MapboxGL: typeof import('@rnmapbox/maps').default | null = null;
-if (Platform.OS !== 'web') {
-    MapboxGL = require('@rnmapbox/maps').default;
-    MapboxGL!.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_TOKEN!);
-}
-
-const WebMap: React.FC<{
+// Web fallback static map
+function WebMap({ center, driverCoords, deliveryCoords }: {
     center: [number, number];
     driverCoords: [number, number] | null;
     deliveryCoords: [number, number];
-}> = ({ center, driverCoords, deliveryCoords }) => {
+}) {
     const TOKEN = process.env.EXPO_PUBLIC_MAPBOX_TOKEN!;
     const [lng, lat] = center;
     const pins =
@@ -53,7 +49,7 @@ const WebMap: React.FC<{
             <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="map" />
         </View>
     );
-};
+}
 
 const STATUS_STEPS: { key: OrderStatus; label: string; icon: string }[] = [
     { key: 'placed',     label: 'Order Placed', icon: 'receipt-outline' },
@@ -83,8 +79,6 @@ export default function OrderTrackingScreen() {
     const { orderId } = useLocalSearchParams<{ orderId: string }>();
     const router = useRouter();
     const { activeOrder, setActiveOrder, updateActiveOrderStatus } = useOrderStore();
-
-    // useOrder handles fetch + Realtime
     const { order, loading } = useOrder(orderId, activeOrder);
 
     useEffect(() => {
@@ -94,7 +88,6 @@ export default function OrderTrackingScreen() {
         }
     }, [order?.status, order?.id]);
 
-    // Driver location 
     const [rawDriverLocation, setRawDriverLocation] = useState<DriverLocation | null>(null);
     const [route, setRoute] = useState<RouteResult | null>(null);
     const [driverProfile, setDriverProfile] = useState<{
@@ -124,20 +117,14 @@ export default function OrderTrackingScreen() {
             const loc = await getDriverLocation(driverIdToTrack);
             if (loc) {
                 setRawDriverLocation(loc);
-                await refreshRoute(
-                    { lat: loc.lat, lng: loc.lng },
-                    { lat: order.delivery_lat, lng: order.delivery_lng }
-                );
+                await refreshRoute({ lat: loc.lat, lng: loc.lng }, { lat: order.delivery_lat, lng: order.delivery_lng });
             }
         })();
 
         unsubDriverRef.current?.();
         unsubDriverRef.current = subscribeToDriverLocation(driverIdToTrack, async (loc) => {
             setRawDriverLocation(loc);
-            await refreshRoute(
-                { lat: loc.lat, lng: loc.lng },
-                { lat: order.delivery_lat, lng: order.delivery_lng }
-            );
+            await refreshRoute({ lat: loc.lat, lng: loc.lng }, { lat: order.delivery_lat, lng: order.delivery_lng });
         });
 
         return () => unsubDriverRef.current?.();
@@ -165,7 +152,6 @@ export default function OrderTrackingScreen() {
         })();
     }, [order?.driver_id]);
 
-    // Derived
     const currentStatus: OrderStatus = order?.status ?? 'placed';
     const currentStepIdx = stepIndex(currentStatus);
     const accentColor = STATUS_COLOR[currentStatus] ?? colors.primary;
@@ -177,11 +163,6 @@ export default function OrderTrackingScreen() {
 
     const deliveryCoords: [number, number] = order ? [order.delivery_lng, order.delivery_lat] : [3.3792, 6.5244];
     const driverCoords: [number, number] | null = smoothedLocation ? [smoothedLocation.lng, smoothedLocation.lat] : null;
-
-    const driverGeoJSON = smoothedLocation ? {
-        type: 'FeatureCollection' as const,
-        features: [{ type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [smoothedLocation.lng, smoothedLocation.lat] }, properties: {} }],
-    } : null;
 
     if (loading) return (
         <View style={tw`flex-1 bg-[${colors.background}] items-center justify-center`}>
@@ -202,32 +183,23 @@ export default function OrderTrackingScreen() {
     return (
         <View style={tw`flex-1 bg-[${colors.background}]`}>
             <View style={tw`h-[42%]`}>
-                {Platform.OS === 'web' ? (
-                    <WebMap center={mapCenter} driverCoords={driverCoords} deliveryCoords={deliveryCoords} />
-                ) : MapboxGL ? (
-                    <MapboxGL.MapView style={tw`flex-1`} styleURL={MapboxGL.StyleURL.Dark} logoEnabled={false} attributionEnabled={false} compassEnabled={false}>
-                        <MapboxGL.Camera ref={cameraRef} centerCoordinate={mapCenter} zoomLevel={14} animationMode="flyTo" animationDuration={1000} />
-
-                        {route && (
-                            <MapboxGL.ShapeSource id="routeSource" shape={{ type: 'Feature', geometry: { type: 'LineString', coordinates: route.coordinates }, properties: {} }}>
-                                <MapboxGL.LineLayer id="routeLine" style={{ lineColor: accentColor, lineWidth: 4, lineOpacity: 0.85, lineCap: 'round', lineJoin: 'round' }} />
-                            </MapboxGL.ShapeSource>
-                        )}
-
-                        {isDriverVisible && driverGeoJSON && (
-                            <MapboxGL.ShapeSource id="driverSource" shape={driverGeoJSON}>
-                                <MapboxGL.CircleLayer id="driverCircle" style={{ circleRadius: 20, circleColor: colors.primary, circleStrokeWidth: 2.5, circleStrokeColor: '#FFFFFF', circlePitchAlignment: 'map' }} />
-                                <MapboxGL.SymbolLayer id="driverIcon" style={{ iconImage: 'bicycle-15', iconSize: 1.3, iconColor: '#FFFFFF', iconAllowOverlap: true, iconIgnorePlacement: true }} />
-                            </MapboxGL.ShapeSource>
-                        )}
-
-                        <MapboxGL.PointAnnotation id="deliveryPin" coordinate={[order.delivery_lng, order.delivery_lat]}>
-                            <View style={tw`w-9 h-9 rounded-full bg-[${colors.success}] items-center justify-center border-2 border-white`}>
-                                <Ionicons name="home" size={16} color={colors.white} />
-                            </View>
-                        </MapboxGL.PointAnnotation>
-                    </MapboxGL.MapView>
-                ) : null}
+                <DeliveryMap
+                    cameraRef={cameraRef}
+                    center={mapCenter}
+                    zoomLevel={14}
+                    routeCoordinates={route?.coordinates ?? null}
+                    routeColor={accentColor}
+                    driverCoordinate={driverCoords}
+                    showDriver={isDriverVisible}
+                    deliveryCoordinate={deliveryCoords}
+                    webFallback={
+                        <WebMap
+                            center={mapCenter}
+                            driverCoords={driverCoords}
+                            deliveryCoords={deliveryCoords}
+                        />
+                    }
+                />
 
                 <TouchableOpacity onPress={() => router.back()} style={tw`absolute top-12 left-4 w-9 h-9 rounded-full bg-[${colors.surface}] items-center justify-center`}>
                     <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />

@@ -1,13 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-    View,
-    Text,
-    ScrollView,
-    ActivityIndicator,
-} from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
 import { supabase } from '../../../services/supabase';
 import useAuthStore from '../../../store/useAuthStore';
 import colors from '../../../constants/colors';
@@ -17,7 +11,6 @@ import PeriodSelector, { Period } from '../../../components/driver/earnings/Peri
 import EarningsStats from '../../../components/driver/earnings/EarningsStats';
 import WeeklyBarChart from '../../../components/driver/earnings/BarChart';
 import DeliveryRow from '../../../components/driver/earnings/DeliveryRow';
-
 import type { OrderWithItems } from '../../../types/order.types';
 
 export default function EarningsScreen() {

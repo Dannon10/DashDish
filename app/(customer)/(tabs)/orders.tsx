@@ -1,16 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {
-    View,
-    Text,
-    ScrollView,
-    TouchableOpacity,
-    ActivityIndicator,
-    RefreshControl,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
 import { getCustomerOrders } from '../../../services/order.service';
 import { supabase } from '../../../services/supabase';
 import useAuthStore from '../../../store/useAuthStore';
@@ -18,11 +10,12 @@ import useOrderStore from '../../../store/useOrderStore';
 import colors from '../../../constants/colors';
 import OrderStatusBar from '../../../components/order/OrderStatusBar';
 import OrderCard from '../../../components/order/OrderCard';
-
 import type { OrderWithItems } from '../../../types/order.types';
 import type { OrderStatus } from '../../../types/database.types';
 
-const ACTIVE_STATUSES: OrderStatus[] = ['placed', 'confirmed', 'preparing', 'picked_up', 'on_the_way'];
+const ACTIVE_STATUSES: OrderStatus[] = [
+    'placed', 'confirmed', 'preparing', 'picked_up', 'on_the_way'
+];
 const isActive = (status: OrderStatus) => ACTIVE_STATUSES.includes(status);
 
 function EmptyState({ onBrowse }: { onBrowse: () => void }) {

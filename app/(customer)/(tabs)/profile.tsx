@@ -65,7 +65,6 @@ function ProfileField({
 
 export default function CustomerProfileScreen() {
     const { profile, setProfile, clearAuth } = useAuthStore();
-
     const [fullName, setFullName] = useState(profile?.full_name ?? '');
     const [phone, setPhone] = useState(profile?.phone ?? '');
     const [address, setAddress] = useState((profile as any)?.address ?? '');
@@ -238,11 +237,6 @@ export default function CustomerProfileScreen() {
                     placeholder="e.g. 14 Awolowo Road, Ikoyi, Lagos"
                     multiline
                 />
-                <View style={tw`px-4 pb-3`}>
-                    <Text style={tw`text-[${colors.textMuted}] text-xs ml-12`}>
-                        This address will be auto-filled at checkout
-                    </Text>
-                </View>
             </View>
 
             {/* Appearance */}

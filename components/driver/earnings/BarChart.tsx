@@ -13,7 +13,7 @@ interface Props {
 
 export default function WeeklyBarChart({ deliveries }: Props) {
     const today = new Date();
-    const mondayOffset = (today.getDay() + 6) % 7; // days since last Monday
+    const mondayOffset = (today.getDay() + 6) % 7;
 
     const dailyEarnings = DAYS.map((_, i) => {
         const date = new Date(today);

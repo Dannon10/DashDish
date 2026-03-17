@@ -19,14 +19,9 @@ import { useOrder } from '../../hooks/useOrder';
 import { useSmoothedLocation } from '../../hooks/useSmoothedLocation';
 import useAuthStore from '../../store/useAuthStore';
 import useDriverStore from '../../store/useDriverStore';
+import DeliveryMap from '../../components/maps/DeliveryMap';
 import colors from '../../constants/colors';
 import type { OrderStatus } from '../../types/database.types';
-
-let MapboxGL: typeof import('@rnmapbox/maps').default | null = null;
-if (Platform.OS !== 'web') {
-    MapboxGL = require('@rnmapbox/maps').default;
-    MapboxGL!.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_TOKEN!);
-}
 
 const NEXT_STATUS: Partial<Record<OrderStatus, { status: 'picked_up' | 'on_the_way' | 'delivered'; label: string; icon: string; color: string }>> = {
     confirmed:  { status: 'picked_up',  label: 'Mark as Picked Up',  icon: 'bag-handle-outline',  color: colors.statusPickedUp },
@@ -47,8 +42,6 @@ export default function DriverActiveScreen() {
     const router = useRouter();
     const { profile } = useAuthStore();
     const { activeDelivery, setActiveDelivery, currentLocation, setCurrentLocation } = useDriverStore();
-
-    // Fetch active order if not in store
     const [activeOrderId, setActiveOrderId] = useState<string | undefined>(activeDelivery?.id);
 
     useEffect(() => {
@@ -63,14 +56,10 @@ export default function DriverActiveScreen() {
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .maybeSingle();
-            if (data) {
-                setActiveDelivery(data);
-                setActiveOrderId(data.id);
-            }
+            if (data) { setActiveDelivery(data); setActiveOrderId(data.id); }
         })();
     }, [profile?.id]);
 
-    // Hooks
     const { order, loading, setOrder } = useOrder(activeOrderId, activeDelivery);
 
     const { coords: driverCoords } = useDriverLocation({
@@ -79,14 +68,10 @@ export default function DriverActiveScreen() {
         enabled: true,
     });
 
-    // Keep store in sync with GPS
-    useEffect(() => {
-        if (driverCoords) setCurrentLocation(driverCoords);
-    }, [driverCoords]);
+    useEffect(() => { if (driverCoords) setCurrentLocation(driverCoords); }, [driverCoords]);
 
     const smoothedDriver = useSmoothedLocation(driverCoords, 1500);
 
-    // Route 
     const [route, setRoute] = useState<RouteResult | null>(null);
     const cameraRef = useRef<any>(null);
 
@@ -103,7 +88,6 @@ export default function DriverActiveScreen() {
         refreshRoute(driverCoords, { lat: order.delivery_lat, lng: order.delivery_lng });
     }, [order?.id, driverCoords?.lat]);
 
-    // Camera follow 
     useEffect(() => {
         if (!smoothedDriver || Platform.OS === 'web') return;
         cameraRef.current?.setCamera({
@@ -114,14 +98,12 @@ export default function DriverActiveScreen() {
         });
     }, [smoothedDriver?.lat, smoothedDriver?.lng]);
 
-    // Status update
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
     const handleUpdateStatus = async () => {
         if (!order) return;
         const next = NEXT_STATUS[order.status];
         if (!next) return;
-
         Alert.alert(next.label, `Confirm: ${next.label}?`, [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -135,7 +117,7 @@ export default function DriverActiveScreen() {
                         setOrder((prev) => prev ? { ...prev, status: next.status } : prev);
                         if (next.status === 'delivered') {
                             setActiveDelivery(null);
-                            Alert.alert('Delivery Complete! 🎉', 'Great job! The order has been delivered.', [
+                            Alert.alert('Delivery Complete! 🎉', 'Great job!', [
                                 { text: 'OK', onPress: () => router.replace('/(driver)') },
                             ]);
                         }
@@ -146,7 +128,6 @@ export default function DriverActiveScreen() {
         ]);
     };
 
-    // Derived
     const currentStatus = order?.status ?? 'confirmed';
     const accentColor = STATUS_COLOR[currentStatus] ?? colors.primary;
     const nextAction = NEXT_STATUS[currentStatus];
@@ -154,11 +135,6 @@ export default function DriverActiveScreen() {
     const mapCenter: [number, number] = smoothedDriver
         ? [smoothedDriver.lng, smoothedDriver.lat]
         : order ? [order.delivery_lng, order.delivery_lat] : [3.3792, 6.5244];
-
-    const driverGeoJSON = smoothedDriver ? {
-        type: 'FeatureCollection' as const,
-        features: [{ type: 'Feature' as const, geometry: { type: 'Point' as const, coordinates: [smoothedDriver.lng, smoothedDriver.lat] }, properties: {} }],
-    } : null;
 
     if (loading) return (
         <View style={tw`flex-1 bg-[${colors.background}] items-center justify-center`}>
@@ -184,43 +160,19 @@ export default function DriverActiveScreen() {
     return (
         <View style={tw`flex-1 bg-[${colors.background}]`}>
             <View style={tw`h-[45%]`}>
-                {Platform.OS !== 'web' && MapboxGL ? (
-                    <MapboxGL.MapView style={tw`flex-1`} styleURL={MapboxGL.StyleURL.Dark} logoEnabled={false} attributionEnabled={false} compassEnabled={false}>
-                        <MapboxGL.Camera ref={cameraRef} centerCoordinate={mapCenter} zoomLevel={15} animationMode="flyTo" animationDuration={1000} />
-
-                        {route && (
-                            <MapboxGL.ShapeSource id="driverRouteSource" shape={{ type: 'Feature', geometry: { type: 'LineString', coordinates: route.coordinates }, properties: {} }}>
-                                <MapboxGL.LineLayer id="driverRouteLine" style={{ lineColor: accentColor, lineWidth: 5, lineOpacity: 0.9, lineCap: 'round', lineJoin: 'round' }} />
-                            </MapboxGL.ShapeSource>
-                        )}
-
-                        {driverGeoJSON && (
-                            <MapboxGL.ShapeSource id="myLocationSource" shape={driverGeoJSON}>
-                                <MapboxGL.CircleLayer id="myLocationCircle" style={{ circleRadius: 20, circleColor: colors.primary, circleStrokeWidth: 2.5, circleStrokeColor: '#FFFFFF' }} />
-                                <MapboxGL.SymbolLayer id="myLocationIcon" style={{ iconImage: 'bicycle-15', iconSize: 1.3, iconColor: '#FFFFFF', iconAllowOverlap: true }} />
-                            </MapboxGL.ShapeSource>
-                        )}
-
-                        {order.restaurants && (
-                            <MapboxGL.PointAnnotation id="restaurantPin" coordinate={[order.restaurants.lng, order.restaurants.lat]}>
-                                <View style={tw`w-9 h-9 rounded-full bg-[${colors.warning}] items-center justify-center border-2 border-white`}>
-                                    <Ionicons name="restaurant" size={16} color="white" />
-                                </View>
-                            </MapboxGL.PointAnnotation>
-                        )}
-
-                        <MapboxGL.PointAnnotation id="deliveryPin" coordinate={[order.delivery_lng, order.delivery_lat]}>
-                            <View style={tw`w-9 h-9 rounded-full bg-[${colors.success}] items-center justify-center border-2 border-white`}>
-                                <Ionicons name="home" size={16} color="white" />
-                            </View>
-                        </MapboxGL.PointAnnotation>
-                    </MapboxGL.MapView>
-                ) : (
-                    <View style={tw`flex-1 bg-[${colors.surfaceElevated}] items-center justify-center`}>
-                        <Ionicons name="map-outline" size={48} color={colors.textMuted} />
-                        <Text style={tw`text-[${colors.textSecondary}] mt-2 text-sm`}>Map available on mobile</Text>
-                    </View>
-                )}
+                <DeliveryMap
+                    cameraRef={cameraRef}
+                    center={mapCenter}
+                    zoomLevel={15}
+                    routeCoordinates={route?.coordinates ?? null}
+                    routeColor={accentColor}
+                    routeWidth={5}
+                    driverCoordinate={smoothedDriver ? [smoothedDriver.lng, smoothedDriver.lat] : null}
+                    showDriver={!!smoothedDriver}
+                    driverColor={colors.primary}
+                    restaurantCoordinate={order.restaurants ? [order.restaurants.lng, order.restaurants.lat] : null}
+                    deliveryCoordinate={[order.delivery_lng, order.delivery_lat]}
+                />
 
                 <TouchableOpacity onPress={() => router.back()} style={tw`absolute top-12 left-4 w-9 h-9 rounded-full bg-[${colors.surface}] items-center justify-center`}>
                     <Ionicons name="chevron-back" size={20} color={colors.textPrimary} />
