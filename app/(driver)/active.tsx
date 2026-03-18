@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
     ActivityIndicator,
     Platform,
     Alert,
 } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -147,12 +147,12 @@ export default function DriverActiveScreen() {
             <View style={tw`w-20 h-20 rounded-full bg-[${colors.surfaceElevated}] items-center justify-center mb-4`}>
                 <Ionicons name="bicycle-outline" size={36} color={colors.textMuted} />
             </View>
-            <Text style={tw`text-[${colors.textPrimary}] text-xl font-bold mb-2`}>No Active Delivery</Text>
+            <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-xl mb-2`}>No Active Delivery</Text>
             <Text style={tw`text-[${colors.textSecondary}] text-sm text-center mb-6`}>
                 Accept an order from the requests screen to start delivering.
             </Text>
             <TouchableOpacity onPress={() => router.replace('/(driver)')} style={tw`bg-[${colors.primary}] px-8 py-3 rounded-xl`}>
-                <Text style={tw`text-white font-bold`}>View Requests</Text>
+                <Text weight='bold' style={tw`text-white`}>View Requests</Text>
             </TouchableOpacity>
         </View>
     );
@@ -180,7 +180,7 @@ export default function DriverActiveScreen() {
 
                 {route && (
                     <View style={tw`absolute top-12 right-4 bg-[${colors.surface}] px-3 py-2 rounded-xl`}>
-                        <Text style={tw`text-[${colors.textPrimary}] font-bold text-sm`}>{formatETA(route.durationSeconds)}</Text>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-sm`}>{formatETA(route.durationSeconds)}</Text>
                         <Text style={tw`text-[${colors.textSecondary}] text-xs text-center`}>{formatDistance(route.distanceMeters)}</Text>
                     </View>
                 )}
@@ -192,9 +192,9 @@ export default function DriverActiveScreen() {
                 </View>
 
                 <View style={tw`flex-row items-center justify-between px-5 pt-4 pb-3`}>
-                    <Text style={tw`text-[${colors.textPrimary}] text-xl font-bold`}>Active Delivery</Text>
+                    <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-xl`}>Active Delivery</Text>
                     <View style={[tw`px-3 py-1.5 rounded-full`, { backgroundColor: `${accentColor}22` }]}>
-                        <Text style={[tw`text-xs font-bold capitalize`, { color: accentColor }]}>{currentStatus.replace(/_/g, ' ')}</Text>
+                        <Text weight='bold' style={[tw`text-xs capitalize`, { color: accentColor }]}>{currentStatus.replace(/_/g, ' ')}</Text>
                     </View>
                 </View>
 
@@ -205,7 +205,7 @@ export default function DriverActiveScreen() {
                         </View>
                         <View style={tw`flex-1`}>
                             <Text style={tw`text-[${colors.textSecondary}] text-xs`}>Pick up from</Text>
-                            <Text style={tw`text-[${colors.textPrimary}] font-semibold text-sm`}>{order.restaurants?.name}</Text>
+                            <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-sm`}>{order.restaurants?.name}</Text>
                         </View>
                     </View>
                     <View style={tw`ml-4 w-0.5 h-4 bg-[${colors.border}] mb-3`} />
@@ -215,13 +215,13 @@ export default function DriverActiveScreen() {
                         </View>
                         <View style={tw`flex-1`}>
                             <Text style={tw`text-[${colors.textSecondary}] text-xs`}>Deliver to</Text>
-                            <Text style={tw`text-[${colors.textPrimary}] font-semibold text-sm`}>{order.delivery_address}</Text>
+                            <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-sm`}>{order.delivery_address}</Text>
                         </View>
                     </View>
                 </View>
 
                 <View style={tw`mx-5 mb-4 p-4 rounded-2xl bg-[${colors.surfaceElevated}]`}>
-                    <Text style={tw`text-[${colors.textPrimary}] font-semibold mb-3`}>Order Items</Text>
+                    <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] mb-3`}>Order Items</Text>
                     {order.order_items?.map((item) => (
                         <View key={item.id} style={tw`flex-row justify-between py-1.5`}>
                             <Text style={tw`text-[${colors.textSecondary}] text-sm`}>{item.quantity}× {item.menu_items?.name}</Text>
@@ -230,7 +230,7 @@ export default function DriverActiveScreen() {
                     ))}
                     <View style={[tw`flex-row justify-between pt-3 mt-2`, { borderTopWidth: 1, borderTopColor: colors.border }]}>
                         <Text style={tw`text-[${colors.textSecondary}] text-sm`}>Your earnings</Text>
-                        <Text style={[tw`font-bold text-sm`, { color: colors.success }]}>₦{order.delivery_fee.toLocaleString()}</Text>
+                        <Text weight='bold' style={[tw`text-sm`, { color: colors.success }]}>₦{order.delivery_fee.toLocaleString()}</Text>
                     </View>
                 </View>
 
@@ -244,7 +244,7 @@ export default function DriverActiveScreen() {
                             {updatingStatus ? <ActivityIndicator size="small" color="white" /> : (
                                 <>
                                     <Ionicons name={nextAction.icon as any} size={20} color="white" />
-                                    <Text style={tw`text-white font-bold text-base`}>{nextAction.label}</Text>
+                                    <Text weight='bold' style={tw`text-white text-base`}>{nextAction.label}</Text>
                                 </>
                             )}
                         </TouchableOpacity>
@@ -255,7 +255,7 @@ export default function DriverActiveScreen() {
                     <View style={tw`px-5`}>
                         <View style={tw`py-4 rounded-xl bg-[${colors.success}22] items-center`}>
                             <Ionicons name="checkmark-circle" size={28} color={colors.success} />
-                            <Text style={[tw`font-bold text-base mt-1`, { color: colors.success }]}>Delivered Successfully!</Text>
+                            <Text weight='bold' style={[tw`text-base mt-1`, { color: colors.success }]}>Delivered Successfully!</Text>
                         </View>
                     </View>
                 )}

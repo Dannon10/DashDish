@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Platform, TouchableOpacity} from 'react-native';
+import { View, Platform, TouchableOpacity} from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -73,7 +74,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
                                     isFocused && { backgroundColor: `${colors.primary}18` },
                                 ]}>
                                     {options.tabBarIcon?.({ color, focused: isFocused, size: 24 })}
-                                    <Text style={[tw`text-[10px] font-semibold tracking-wide`, { color }]}>
+                                    <Text weight='semiBold' style={[tw`text-[10px] tracking-wide`, { color }]}>
                                         {label}
                                     </Text>
                                 </View>

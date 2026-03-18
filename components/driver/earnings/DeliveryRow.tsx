@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import colors from '../../../constants/colors';
@@ -37,7 +38,7 @@ export default function DeliveryRow({ order, isLast = false }: Props) {
             </View>
 
             <View style={tw`flex-1`}>
-                <Text style={tw`text-[${colors.textPrimary}] text-sm font-semibold`} numberOfLines={1}>
+                <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-sm`} numberOfLines={1}>
                     {order.restaurants?.name ?? 'Restaurant'}
                 </Text>
                 <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`} numberOfLines={1}>
@@ -56,7 +57,7 @@ export default function DeliveryRow({ order, isLast = false }: Props) {
                 </View>
             </View>
 
-            <Text style={[tw`font-bold text-sm ml-2`, { color: colors.success }]}>
+            <Text weight='bold' style={[tw`text-sm ml-2`, { color: colors.success }]}>
                 +₦{order.delivery_fee.toLocaleString()}
             </Text>
         </View>

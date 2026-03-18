@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
     TextInput,
     ActivityIndicator,
     Alert,
 } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -92,8 +92,7 @@ export default function CheckoutScreen() {
 
     useEffect(() => {
         if (items.length === 0) {
-            router.replace('/(customer)/order');
-            // router.replace('/(customer)/cart');
+            router.replace('/(customer)/orders');
         }
     }, [items.length]);
 
@@ -107,13 +106,13 @@ export default function CheckoutScreen() {
                 >
                     <Ionicons name="arrow-back" size={20} color="white" />
                 </TouchableOpacity>
-                <Text style={tw`text-white text-2xl font-bold`}>Checkout</Text>
+                <Text weight='bold' style={tw`text-white text-2xl`}>Checkout</Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Delivery Address */}
                 <View style={tw`px-5 mb-6`}>
-                    <Text style={tw`text-white font-bold text-lg mb-4`}>
+                    <Text weight='bold' style={tw`text-white text-lg mb-4`}>
                         Delivery Address
                     </Text>
 
@@ -147,7 +146,7 @@ export default function CheckoutScreen() {
                                 style={tw`flex-row items-center gap-1.5 mt-3 self-start bg-[${colors.primary}22] px-3 py-1.5 rounded-full`}
                             >
                                 <Ionicons name="location" size={12} color={colors.primary} />
-                                <Text style={[tw`text-xs font-semibold`, { color: colors.primary }]}>
+                                <Text weight='semiBold' style={[tw`text-xs`, { color: colors.primary }]}>
                                     Use saved address
                                 </Text>
                             </TouchableOpacity>
@@ -157,7 +156,7 @@ export default function CheckoutScreen() {
                                 style={tw`flex-row items-center gap-1.5 mt-3 self-start`}
                             >
                                 <Text style={tw`text-[${colors.textMuted}] text-xs`}>No saved address —</Text>
-                                <Text style={[tw`text-xs font-semibold`, { color: colors.primary }]}>
+                                <Text weight='semiBold' style={[tw`text-xs`, { color: colors.primary }]}>
                                     add one in profile →
                                 </Text>
                             </TouchableOpacity>
@@ -174,7 +173,7 @@ export default function CheckoutScreen() {
 
                 {/* Order items */}
                 <View style={tw`px-5 mb-6`}>
-                    <Text style={tw`text-white font-bold text-lg mb-4`}>
+                    <Text weight='bold' style={tw`text-white text-lg mb-4`}>
                         Order from {restaurantName}
                     </Text>
                     <View style={tw`bg-[#141414] rounded-2xl overflow-hidden`}>
@@ -188,7 +187,7 @@ export default function CheckoutScreen() {
                                     <View
                                         style={tw`w-6 h-6 bg-[#7C3AED]/20 rounded-full items-center justify-center`}
                                     >
-                                        <Text style={tw`text-[#7C3AED] text-xs font-bold`}>
+                                        <Text weight='semiBold' style={tw`text-[#7C3AED] text-xs`}>
                                             {quantity}
                                         </Text>
                                     </View>
@@ -196,7 +195,7 @@ export default function CheckoutScreen() {
                                         {menuItem.name}
                                     </Text>
                                 </View>
-                                <Text style={tw`text-white font-semibold text-sm`}>
+                                <Text weight='semiBold' style={tw`text-white text-sm`}>
                                     {formatCurrency(menuItem.price * quantity)}
                                 </Text>
                             </View>
@@ -206,22 +205,22 @@ export default function CheckoutScreen() {
 
                 {/* Price breakdown */}
                 <View style={tw`mx-5 bg-[#141414] rounded-2xl p-5 mb-8`}>
-                    <Text style={tw`text-white font-bold text-lg mb-4`}>Price Breakdown</Text>
+                    <Text weight='bold' style={tw`text-white text-lg mb-4`}>Price Breakdown</Text>
                     <View style={tw`flex-row justify-between mb-3`}>
                         <Text style={tw`text-[#A0A0A0]`}>Subtotal</Text>
-                        <Text style={tw`text-white font-semibold`}>{formatCurrency(subtotal)}</Text>
+                        <Text weight='semiBold' style={tw`text-white`}>{formatCurrency(subtotal)}</Text>
                     </View>
                     <View style={tw`flex-row justify-between mb-3`}>
                         <View style={tw`flex-row items-center gap-1`}>
                             <Text style={tw`text-[#A0A0A0]`}>Delivery fee</Text>
                             <Text style={tw`text-[#555555] text-xs`}>({DEMO_DISTANCE_KM}km)</Text>
                         </View>
-                        <Text style={tw`text-white font-semibold`}>{formatCurrency(deliveryFee)}</Text>
+                        <Text weight='semiBold' style={tw`text-white`}>{formatCurrency(deliveryFee)}</Text>
                     </View>
                     <View style={tw`h-px bg-[#2A2A2A] my-3`} />
                     <View style={tw`flex-row justify-between`}>
-                        <Text style={tw`text-white font-bold text-base`}>Total</Text>
-                        <Text style={tw`text-[#7C3AED] font-bold text-lg`}>
+                        <Text weight='bold' style={tw`text-white text-base`}>Total</Text>
+                        <Text weight='bold' style={tw`text-[#7C3AED] text-lg`}>
                             {formatCurrency(total)}
                         </Text>
                     </View>
@@ -239,14 +238,14 @@ export default function CheckoutScreen() {
                     {geocoding ? (
                         <>
                             <ActivityIndicator size="small" color="white" />
-                            <Text style={tw`text-white font-bold text-base`}>
+                            <Text weight='bold' style={tw`text-white text-base`}>
                                 Finding your location...
                             </Text>
                         </>
                     ) : (
                         <>
                             <Ionicons name="card-outline" size={20} color="white" />
-                            <Text style={tw`text-white font-bold text-base`}>
+                            <Text weight='bold' style={tw`text-white text-base`}>
                                 Pay {formatCurrency(total)}
                             </Text>
                         </>

@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
+import { Text } from '../../components/ui/AppText';
 import { MenuItem as MenuItemType } from '../../types/restaurant.types';
 import useCartStore from '../../store/useCartStore';
 import formatCurrency from '../../utils/formatCurrency';
@@ -30,22 +30,22 @@ export default function MenuItem({
         <View style={tw`flex-row items-center py-4 border-b border-[#1E1E1E]`}>
             {/* Item info */}
             <View style={tw`flex-1 mr-4`}>
-                <Text style={tw`text-white font-semibold text-base mb-1`}>
+                <Text weight='semiBold' style={tw`text-white text-base mb-1`}>
                     {item.name}
                 </Text>
                 {item.description && (
-                    <Text style={tw`text-[#A0A0A0] text-sm mb-2`} numberOfLines={2}>
+                    <Text weight='medium' style={tw`text-[#A0A0A0] text-sm mb-2`} numberOfLines={2}>
                         {item.description}
                     </Text>
                 )}
-                <Text style={tw`text-[#7C3AED] font-bold text-base`}>
+                <Text weight='bold' style={tw`text-[#7C3AED] text-base`}>
                     {formatCurrency(item.price)}
                 </Text>
             </View>
 
             {/* Image + quantity controls */}
             <View style={tw`items-center`}>
-                <View style={tw`w-35 h-30 rounded-xl bg-[#1E1E1E] items-center justify-center mb-2 overflow-hidden`}>
+                <View style={tw`w-30 h-25 rounded-xl bg-[#1E1E1E] items-center justify-center mb-2 overflow-hidden`}>
                     {item.image_url ? (
                         <Image
                             source={{ uri: item.image_url }}
@@ -64,7 +64,7 @@ export default function MenuItem({
                             addItem(item, restaurantId, restaurantName, restaurantLat, restaurantLng)
                         }
                     >
-                        <Text style={tw`text-white font-semibold text-sm`}>Add</Text>
+                        <Text weight='semiBold' style={tw`text-white text-sm`}>Add</Text>
                     </TouchableOpacity>
                 ) : (
                     <View style={tw`flex-row items-center gap-3`}>
@@ -74,7 +74,7 @@ export default function MenuItem({
                         >
                             <Ionicons name="remove" size={16} color="white" />
                         </TouchableOpacity>
-                        <Text style={tw`text-white font-bold text-base`}>{quantity}</Text>
+                        <Text weight='bold' style={tw`text-white text-base`}>{quantity}</Text>
                         <TouchableOpacity
                             style={tw`w-7 h-7 bg-[#7C3AED] rounded-full items-center justify-center`}
                             onPress={() => incrementItem(item.id)}

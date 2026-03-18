@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { View, Dimensions } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import tw from 'twrnc';
 import colors from '../../../constants/colors';
 import type { OrderWithItems } from '../../../types/order.types';
@@ -39,7 +40,7 @@ export default function WeeklyBarChart({ deliveries }: Props) {
 
     return (
         <View style={tw`mx-5 mb-4 p-4 rounded-2xl bg-[${colors.surfaceElevated}]`}>
-            <Text style={tw`text-[${colors.textPrimary}] font-semibold mb-4`}>This Week</Text>
+            <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] mb-4`}>This Week</Text>
             <View style={tw`flex-row items-end justify-between`}>
                 {dailyEarnings.map((amount, i) => {
                     const isToday = i === todayIdx;
@@ -71,8 +72,9 @@ export default function WeeklyBarChart({ deliveries }: Props) {
                                 }}
                             />
                             <Text
+                            weight='medium'
                                 style={[
-                                    tw`text-[10px] mt-1.5 font-medium`,
+                                    tw`text-[10px] mt-1.5`,
                                     { color: isToday ? colors.primary : colors.textMuted },
                                 ]}
                             >

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import tw from 'twrnc';
 import colors from '../../../constants/colors';
 
@@ -20,7 +21,7 @@ function StatCard({
 }) {
     return (
         <View style={tw`flex-1 p-4 rounded-2xl bg-[${colors.surfaceElevated}] items-center`}>
-            <Text style={[tw`text-xl font-bold`, { color: valueColor ?? colors.textPrimary }]}>
+            <Text weight='bold' style={[tw`text-xl`, { color: valueColor ?? colors.textPrimary }]}>
                 {value}
             </Text>
             <Text style={tw`text-[${colors.textMuted}] text-[10px] mt-1 text-center`}>

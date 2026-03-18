@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
 import OrderStatusBadge from './OrderStatusBadge';
 import colors from '../../constants/colors';
 import type { OrderWithItems } from '../../types/order.types';
@@ -52,7 +52,8 @@ export default function OrderCard({ order, onPress }: Props) {
             <View style={tw`flex-1`}>
                 <View style={tw`flex-row items-center justify-between mb-1`}>
                     <Text
-                        style={tw`text-[${colors.textPrimary}] font-semibold text-sm flex-1 mr-2`}
+                    weight='semiBold'
+                        style={tw`text-[${colors.textPrimary}] text-sm flex-1 mr-2`}
                         numberOfLines={1}
                     >
                         {order.restaurants?.name}
@@ -67,7 +68,7 @@ export default function OrderCard({ order, onPress }: Props) {
                     <Text style={tw`text-[${colors.textMuted}] text-xs`}>
                         {formatDate(order.created_at)}
                     </Text>
-                    <Text style={tw`text-[${colors.textPrimary}] text-xs font-semibold`}>
+                    <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-xs`}>
                         ₦{order.total_amount.toLocaleString()}
                     </Text>
                 </View>

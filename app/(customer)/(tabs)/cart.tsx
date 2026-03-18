@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -27,7 +28,7 @@ export default function CartScreen() {
         return (
             <View style={tw`flex-1 bg-[#0A0A0A] items-center justify-center px-6`}>
                 <Ionicons name="bag-outline" size={64} color={colors.textMuted} />
-                <Text style={tw`text-white font-bold text-xl mt-4`}>
+                <Text weight='bold' style={tw`text-white text-lg mt-4`}>
                     Your cart is empty
                 </Text>
                 <Text style={tw`text-[#A0A0A0] text-sm mt-2 text-center`}>
@@ -37,7 +38,7 @@ export default function CartScreen() {
                     style={tw`mt-6 bg-[#7C3AED] px-8 py-3 rounded-xl`}
                     onPress={() => router.push('/(customer)')}
                 >
-                    <Text style={tw`text-white font-semibold`}>Browse Restaurants</Text>
+                    <Text weight='semiBold' style={tw`text-white`}>Browse Restaurants</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -49,7 +50,7 @@ export default function CartScreen() {
             {/* Header */}
             <View style={tw`px-5 pt-14 pb-4 flex-row items-center justify-between`}>
                 <View>
-                    <Text style={tw`text-white text-2xl font-bold`}>Your Cart</Text>
+                    <Text weight='bold' style={tw`text-white text-2xl`}>Your Cart</Text>
                     <Text style={tw`text-[#A0A0A0] text-sm mt-1`}>
                         {restaurantName} • {totalItems} item{totalItems !== 1 ? 's' : ''}
                     </Text>
@@ -58,7 +59,7 @@ export default function CartScreen() {
                     onPress={clearCart}
                     style={tw`bg-[#141414] border border-[#2A2A2A] px-3 py-2 rounded-xl`}
                 >
-                    <Text style={tw`text-red-400 text-sm font-medium`}>Clear</Text>
+                    <Text weight='medium' style={tw`text-red-400 text-sm`}>Clear</Text>
                 </TouchableOpacity>
             </View>
 
@@ -91,11 +92,12 @@ export default function CartScreen() {
                             {/* Item Details */}
                             <View style={tw`flex-1`}>
                                 <Text 
-                                style={tw`text-white font-semibold text-base`} 
+                                weight='semiBold'
+                                style={tw`text-white text-base`} 
                                 numberOfLines={1}>
                                     {menuItem.name}
                                 </Text>
-                                <Text style={tw`text-[#7C3AED] font-bold text-sm mt-1`}>
+                                <Text weight='bold' style={tw`text-[#7C3AED] text-sm mt-1`}>
                                     {formatCurrency(menuItem.price * quantity)}
                                 </Text>
                                 {quantity > 1 && (
@@ -117,7 +119,7 @@ export default function CartScreen() {
                                         color="white" 
                                     />
                                 </TouchableOpacity>
-                                <Text style={tw`text-white font-bold text-base w-4 text-center`}>
+                                <Text weight='bold' style={tw`text-white text-base w-4 text-center`}>
                                     {quantity}
                                 </Text>
                                 <TouchableOpacity
@@ -133,11 +135,11 @@ export default function CartScreen() {
 
                 {/* Order Summary */}
                 <View style={tw`mx-5 bg-[#141414] rounded-2xl p-5 mb-6`}>
-                    <Text style={tw`text-white font-bold text-lg mb-4`}>Order Summary</Text>
+                    <Text weight='bold' style={tw`text-white text-lg mb-4`}>Order Summary</Text>
 
                     <View style={tw`flex-row justify-between mb-3`}>
                         <Text style={tw`text-[#A0A0A0]`}>Subtotal</Text>
-                        <Text style={tw`text-white font-semibold`}>{formatCurrency(subtotal)}</Text>
+                        <Text weight='semiBold' style={tw`text-white`}>{formatCurrency(subtotal)}</Text>
                     </View>
 
                     <View style={tw`flex-row justify-between mb-3`}>
@@ -148,8 +150,8 @@ export default function CartScreen() {
                     <View style={tw`h-px bg-[#2A2A2A] my-3`} />
 
                     <View style={tw`flex-row justify-between`}>
-                        <Text style={tw`text-white font-bold text-base`}>Total</Text>
-                        <Text style={tw`text-[#7C3AED] font-bold text-base`}>
+                        <Text weight='bold' style={tw`text-white text-base`}>Total</Text>
+                        <Text weight='bold' style={tw`text-[#7C3AED] text-base`}>
                             {formatCurrency(subtotal)}+
                         </Text>
                     </View>
@@ -163,7 +165,7 @@ export default function CartScreen() {
                     style={tw`bg-[#7C3AED] py-4 rounded-xl items-center`}
                     onPress={() => router.push('/(customer)/checkout')}
                 >
-                    <Text style={tw`text-white font-bold text-base`}>
+                    <Text weight='bold' style={tw`text-white text-base`}>
                         Proceed to Checkout
                     </Text>
                 </TouchableOpacity>

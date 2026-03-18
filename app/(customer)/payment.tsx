@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
     View,
-    Text,
     ActivityIndicator,
     TouchableOpacity,
     ScrollView,
     Platform,
     Alert,
 } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -152,7 +152,7 @@ const handleCreateOrder = async (reference: string) => {
         return (
             <View style={tw`flex-1 bg-[#0A0A0A] items-center justify-center`}>
                 <ActivityIndicator color={colors.primary} size="large" />
-                <Text style={tw`text-white mt-4 font-semibold text-base`}>
+                <Text weight='semiBold' style={tw`text-white mt-4 text-base`}>
                     Processing payment...
                 </Text>
                 <Text style={tw`text-[#A0A0A0] mt-2 text-sm`}>
@@ -173,7 +173,7 @@ const handleCreateOrder = async (reference: string) => {
                 >
                     <Ionicons name="arrow-back" size={20} color="white" />
                 </TouchableOpacity>
-                <Text style={tw`text-white text-2xl font-bold`}>Payment</Text>
+                <Text weight='bold' style={tw`text-white text-2xl `}>Payment</Text>
             </View>
 
             {/* Scrollable content */}
@@ -191,25 +191,25 @@ const handleCreateOrder = async (reference: string) => {
 
                 {/* Order Summary */}
                 <View style={tw`mx-5 bg-[#141414] rounded-2xl p-5 mb-4`}>
-                    <Text style={tw`text-white font-bold text-base mb-4`}>
+                    <Text weight='bold' style={tw`text-white text-base mb-4`}>
                         Order Summary
                     </Text>
                     <View style={tw`flex-row justify-between mb-3`}>
                         <Text style={tw`text-[#A0A0A0]`}>Subtotal</Text>
-                        <Text style={tw`text-white font-semibold`}>
+                        <Text weight='semiBold' style={tw`text-white`}>
                             {formatCurrency(subtotal)}
                         </Text>
                     </View>
                     <View style={tw`flex-row justify-between mb-3`}>
                         <Text style={tw`text-[#A0A0A0]`}>Delivery fee</Text>
-                        <Text style={tw`text-white font-semibold`}>
+                        <Text weight='semiBold' style={tw`text-white`}>
                             {formatCurrency(deliveryFee)}
                         </Text>
                     </View>
                     <View style={tw`h-px bg-[#2A2A2A] my-2`} />
                     <View style={tw`flex-row justify-between mt-2`}>
-                        <Text style={tw`text-white font-bold text-base`}>Total</Text>
-                        <Text style={tw`text-[#7C3AED] font-bold text-lg`}>
+                        <Text weight='bold' style={tw`text-white text-base`}>Total</Text>
+                        <Text weight='bold' style={tw`text-[#7C3AED] text-lg`}>
                             {formatCurrency(total)}
                         </Text>
                     </View>
@@ -221,7 +221,7 @@ const handleCreateOrder = async (reference: string) => {
                         <Ionicons name="location-outline" size={20} color={colors.primary} />
                         <View style={tw`flex-1`}>
                             <Text style={tw`text-[#A0A0A0] text-xs mb-1`}>Delivering to</Text>
-                            <Text style={tw`text-white text-sm font-medium`}>
+                            <Text weight='medium' style={tw`text-white text-sm`}>
                                 {params.address}
                             </Text>
                         </View>
@@ -230,7 +230,7 @@ const handleCreateOrder = async (reference: string) => {
 
                 {/* Test Card Info */}
                 <View style={tw`mx-5 bg-[#141414] rounded-2xl p-5 mb-6`}>
-                    <Text style={tw`text-white font-semibold mb-3`}>Test Card</Text>
+                    <Text weight='semiBold' style={tw`text-white mb-3`}>Test Card</Text>
                     <View style={tw`gap-2`}>
                         <View style={tw`flex-row justify-between`}>
                             <Text style={tw`text-[#A0A0A0] text-sm`}>Card</Text>
@@ -265,7 +265,7 @@ const handleCreateOrder = async (reference: string) => {
                             disabled={!scriptLoaded}
                         >
                             <Ionicons name="card-outline" size={20} color="white" />
-                            <Text style={tw`text-white font-bold text-base`}>
+                            <Text weight='bold' style={tw`text-white text-base`}>
                                 {scriptLoaded
                                     ? `Pay ${formatCurrency(total)}`
                                     : 'Loading payment...'}
@@ -277,7 +277,7 @@ const handleCreateOrder = async (reference: string) => {
                             onPress={handleSimulatePayment}
                         >
                             <Ionicons name="card-outline" size={20} color="white" />
-                            <Text style={tw`text-white font-bold text-base`}>
+                            <Text weight='bold' style={tw`text-white text-base`}>
                                 Simulate Payment • {formatCurrency(total)}
                             </Text>
                         </TouchableOpacity>
@@ -290,4 +290,3 @@ const handleCreateOrder = async (reference: string) => {
         </View>
     );
 }
-

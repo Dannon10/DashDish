@@ -2,7 +2,6 @@ import React from 'react';
 import { useState } from 'react';
 import {
     View,
-    Text,
     TextInput,
     TouchableOpacity,
     KeyboardAvoidingView,
@@ -10,6 +9,7 @@ import {
     Platform,
     ActivityIndicator,
 } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import { signIn, signUp } from '../../services/auth.service';
@@ -92,10 +92,10 @@ export default function LoginScreen() {
             >
                 {/* Header */}
                 <View style={tw`mb-10`}>
-                    <Text style={tw`text-[#7C3AED] text-base font-semibold mb-1`}>
+                    <Text weight='semiBold' style={tw`text-[#7C3AED] text-base mb-1`}>
                         DashDish
                     </Text>
-                    <Text style={tw`text-white text-3xl font-bold`}>
+                    <Text weight='bold' style={tw`text-white text-3xl`}>
                         {isRegistering ? 'Create account' : 'Welcome back'}
                     </Text>
                     <Text style={tw`text-[#A0A0A0] text-base mt-2`}>
@@ -181,7 +181,7 @@ export default function LoginScreen() {
                     {loading ? (
                         <ActivityIndicator color="white" />
                     ) : (
-                        <Text style={tw`text-white font-bold text-base`}>
+                        <Text weight='bold' style={tw`text-white text-base`}>
                             {isRegistering ? 'Create Account' : 'Sign In'}
                         </Text>
                     )}
@@ -196,7 +196,7 @@ export default function LoginScreen() {
                         {isRegistering
                             ? 'Already have an account? '
                             : "Don't have an account? "}
-                        <Text style={tw`text-[#7C3AED] font-semibold`}>
+                        <Text weight='semiBold' style={tw`text-[#7C3AED]`}>
                             {isRegistering ? 'Sign In' : 'Sign Up'}
                         </Text>
                     </Text>

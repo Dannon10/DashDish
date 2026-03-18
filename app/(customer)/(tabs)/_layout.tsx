@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Platform, TouchableOpacity} from 'react-native';
+import { View, Platform, TouchableOpacity} from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -21,7 +22,7 @@ function CartTabIcon({ color, focused }: { color: string; focused: boolean }) {
                     tw`absolute -top-1 -right-2 min-w-[16px] h-4 rounded-full items-center justify-center px-1`,
                     { backgroundColor: colors.primary },
                 ]}>
-                    <Text style={tw`text-white text-[10px] font-bold`}>
+                    <Text weight='bold' style={tw`text-white text-[10px]`}>
                         {totalItems > 99 ? '99+' : totalItems}
                     </Text>
                 </View>
@@ -101,7 +102,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
                                     isFocused && { backgroundColor: `${colors.primary}18` },
                                 ]}>
                                     {options.tabBarIcon?.({ color, focused: isFocused, size: 24 })}
-                                    <Text style={[tw`text-[10px] font-semibold tracking-wide`, { color }]}>
+                                    <Text weight='semiBold' style={[tw`text-[10px] tracking-wide`, { color }]}>
                                         {label}
                                     </Text>
                                 </View>

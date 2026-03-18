@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
+import { Text } from '../../components/ui/AppText';
 import OrderStatusBadge, { STATUS_COLOR } from './OrderStatusBadge';
 import colors from '../../constants/colors';
 import type { OrderWithItems } from '../../types/order.types';
@@ -39,7 +39,7 @@ export default function OrderStatusBar({ order, onPress }: Props) {
                         >
                             <Ionicons name="time-outline" size={16} color={color} />
                         </View>
-                        <Text style={tw`text-[${colors.textPrimary}] font-bold text-sm`}>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-sm`}>
                             Active Order
                         </Text>
                     </View>
@@ -61,7 +61,7 @@ export default function OrderStatusBar({ order, onPress }: Props) {
                         </View>
                     )}
                     <View style={tw`flex-1`}>
-                        <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base`}>
+                        <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-base`}>
                             {order.restaurants?.name}
                         </Text>
                         <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>
@@ -91,7 +91,7 @@ export default function OrderStatusBar({ order, onPress }: Props) {
                             { backgroundColor: color },
                         ]}
                     >
-                        <Text style={tw`text-white text-xs font-bold`}>Track</Text>
+                        <Text weight='bold' style={tw`text-white text-xs`}>Track</Text>
                         <Ionicons name="arrow-forward" size={12} color="white" />
                     </View>
                 </View>

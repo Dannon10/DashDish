@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
     TextInput,
@@ -9,6 +8,7 @@ import {
     ActivityIndicator,
     Switch,
 } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import { supabase } from '../../../services/supabase';
@@ -20,7 +20,7 @@ import colors from '../../../constants/colors';
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <View style={tw`mx-5 mb-4`}>
-            <Text style={tw`text-[${colors.textMuted}] text-xs font-semibold uppercase tracking-widest mb-2 px-1`}>
+            <Text weight='medium' style={tw`text-[${colors.textMuted}] text-xs uppercase tracking-widest mb-2 px-1`}>
                 {title}
             </Text>
             <View style={[tw`rounded-2xl overflow-hidden`, { backgroundColor: colors.surfaceElevated }]}>
@@ -128,7 +128,7 @@ export default function DriverProfileScreen() {
             showsVerticalScrollIndicator={false}
         >
             <View style={tw`px-5 pt-14 pb-6`}>
-                <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>Profile</Text>
+                <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>Profile</Text>
             </View>
 
             {/* Avatar */}
@@ -144,11 +144,11 @@ export default function DriverProfileScreen() {
                         setProfile({ ...profile, avatar_url: url });
                     }}
                 />
-                <Text style={tw`text-[${colors.textPrimary}] text-lg font-bold mt-3`}>
+                <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-lg mt-3`}>
                     {fullName || 'Driver'}
                 </Text>
                 <View style={[tw`px-3 py-1 rounded-full mt-1`, { backgroundColor: `${colors.primary}22` }]}>
-                    <Text style={[tw`text-xs font-semibold`, { color: colors.primary }]}>Driver</Text>
+                    <Text weight='semiBold' style={[tw`text-xs`, { color: colors.primary }]}>Driver</Text>
                 </View>
             </View>
 
@@ -170,7 +170,7 @@ export default function DriverProfileScreen() {
                         <Ionicons name="radio-outline" size={16} color={colors.primary} />
                     </View>
                     <Text style={tw`text-[${colors.textPrimary}] text-sm flex-1`}>
-                        {isOnline ? 'Online — accepting orders' : 'Offline'}
+                        {isOnline ? 'Online: Accepting orders' : 'Offline'}
                     </Text>
                     <Switch
                         value={isOnline}
@@ -207,7 +207,7 @@ export default function DriverProfileScreen() {
                             ? <ActivityIndicator size="small" color="white" />
                             : <>
                                 <Ionicons name="checkmark-circle-outline" size={18} color="white" />
-                                <Text style={tw`text-white font-bold text-base`}>Save Changes</Text>
+                                <Text weight='bold' style={tw`text-white text-base`}>Save Changes</Text>
                             </>
                         }
                     </TouchableOpacity>
@@ -221,7 +221,7 @@ export default function DriverProfileScreen() {
                     style={[tw`py-4 rounded-xl items-center justify-center flex-row gap-2`, { borderWidth: 1, borderColor: colors.error }]}
                 >
                     <Ionicons name="log-out-outline" size={18} color={colors.error} />
-                    <Text style={[tw`font-bold text-base`, { color: colors.error }]}>Log Out</Text>
+                    <Text style={[tw`text-base`, { color: colors.error }]}>Log Out</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>

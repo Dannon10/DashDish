@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import {
     View,
-    Text,
     TouchableOpacity,
     Animated,
 } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import colors from '../../constants/colors';
@@ -71,7 +71,7 @@ export default function RequestCard({
                                 { backgroundColor: accentColor, transform: [{ scale: pulseAnim }] },
                             ]}
                         />
-                        <Text style={tw`text-[${colors.textPrimary}] font-bold text-base`}>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-base`}>
                             {isSimulated ? 'Demo Order' : 'New Request'}
                         </Text>
                     </View>
@@ -80,7 +80,7 @@ export default function RequestCard({
                         { backgroundColor: `${colors.success}18` },
                     ]}>
                         <Ionicons name="cash-outline" size={13} color={colors.success} />
-                        <Text style={[tw`text-xs font-bold`, { color: colors.success }]}>
+                        <Text weight='bold' style={[tw`text-xs`, { color: colors.success }]}>
                             ₦{order.delivery_fee.toLocaleString()}
                         </Text>
                     </View>
@@ -94,7 +94,7 @@ export default function RequestCard({
                         </View>
                         <View style={tw`flex-1`}>
                             <Text style={tw`text-[${colors.textMuted}] text-[10px] uppercase tracking-widest mb-0.5`}>Pick up</Text>
-                            <Text style={tw`text-[${colors.textPrimary}] text-sm font-semibold`} numberOfLines={1}>
+                            <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-sm`} numberOfLines={1}>
                                 {order.restaurants?.name}
                             </Text>
                             <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`} numberOfLines={1}>
@@ -115,7 +115,7 @@ export default function RequestCard({
                         </View>
                         <View style={tw`flex-1`}>
                             <Text style={tw`text-[${colors.textMuted}] text-[10px] uppercase tracking-widest mb-0.5`}>Deliver to</Text>
-                            <Text style={tw`text-[${colors.textPrimary}] text-sm font-semibold`} numberOfLines={1}>
+                            <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-sm`} numberOfLines={1}>
                                 {order.delivery_address}
                             </Text>
                         </View>
@@ -125,19 +125,19 @@ export default function RequestCard({
                 {/* Stats */}
                 <View style={[tw`flex-row mx-4 mb-4 rounded-xl overflow-hidden`, { backgroundColor: colors.background }]}>
                     <View style={tw`flex-1 items-center py-3`}>
-                        <Text style={tw`text-[${colors.textPrimary}] font-bold text-base`}>{totalItems}</Text>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-base`}>{totalItems}</Text>
                         <Text style={tw`text-[${colors.textMuted}] text-[10px] mt-0.5`}>{totalItems === 1 ? 'Item' : 'Items'}</Text>
                     </View>
                     <View style={[tw`w-px my-3`, { backgroundColor: colors.border }]} />
                     <View style={tw`flex-1 items-center py-3`}>
-                        <Text style={tw`text-[${colors.textPrimary}] font-bold text-base`}>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-base`}>
                             ₦{order.total_amount.toLocaleString()}
                         </Text>
                         <Text style={tw`text-[${colors.textMuted}] text-[10px] mt-0.5`}>Order value</Text>
                     </View>
                     <View style={[tw`w-px my-3`, { backgroundColor: colors.border }]} />
                     <View style={tw`flex-1 items-center py-3`}>
-                        <Text style={[tw`font-bold text-base`, { color: colors.success }]}>
+                        <Text weight='bold' style={[tw`text-[${colors.textPrimary}] text-base`, { color: colors.success }]}>
                             ₦{order.delivery_fee.toLocaleString()}
                         </Text>
                         <Text style={tw`text-[${colors.textMuted}] text-[10px] mt-0.5`}>Your cut</Text>
@@ -151,7 +151,7 @@ export default function RequestCard({
                         disabled={isLoading}
                         style={[tw`flex-1 py-3.5 rounded-xl items-center justify-center`, { borderWidth: 1, borderColor: colors.border }]}
                     >
-                        <Text style={tw`text-[${colors.textSecondary}] font-semibold text-sm`}>Decline</Text>
+                        <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-sm`}>Decline</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={onAccept}
@@ -166,7 +166,7 @@ export default function RequestCard({
                             size={18}
                             color="white"
                         />
-                        <Text style={tw`text-white font-bold text-sm`}>
+                        <Text weight='semiBold' style={tw`text-white text-sm`}>
                             {isSimulated ? 'Simulate' : 'Accept'}
                         </Text>
                     </TouchableOpacity>

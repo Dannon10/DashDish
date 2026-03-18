@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
     TextInput,
     Alert,
     ActivityIndicator,
 } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import { supabase } from '../../../services/supabase';
@@ -155,7 +155,7 @@ export default function CustomerProfileScreen() {
         >
             {/* Header */}
             <View style={tw`px-5 pt-14 pb-6`}>
-                <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>Profile</Text>
+                <Text style={tw`text-[${colors.textPrimary}] text-2xl`}>Profile</Text>
                 <Text style={tw`text-[${colors.textSecondary}] text-sm mt-0.5`}>
                     Manage your account
                 </Text>
@@ -171,7 +171,7 @@ export default function CustomerProfileScreen() {
                     editable
                     onUpload={handleAvatarUpload}
                 />
-                <Text style={tw`text-[${colors.textPrimary}] text-lg font-bold mt-3`}>
+                <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-lg mt-3`}>
                     {profile.full_name}
                 </Text>
                 <View style={[
@@ -179,31 +179,31 @@ export default function CustomerProfileScreen() {
                     { backgroundColor: `${colors.info}22` },
                 ]}>
                     <Ionicons name="person" size={12} color={colors.info} />
-                    <Text style={[tw`text-xs font-semibold`, { color: colors.info }]}>Customer</Text>
+                    <Text weight='semiBold' style={[tw`text-xs`, { color: colors.info }]}>Customer</Text>
                 </View>
             </View>
 
             {/* Stats */}
             <View style={tw`flex-row mx-5 mb-4 gap-3`}>
                 <View style={tw`flex-1 p-4 rounded-2xl bg-[${colors.surfaceElevated}] items-center`}>
-                    <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>
+                    <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>
                         {totalOrders}
                     </Text>
-                    <Text style={tw`text-[${colors.textMuted}] text-[10px] mt-1`}>Orders</Text>
+                    <Text weight='medium' style={tw`text-[${colors.textMuted}] text-[10px] mt-1`}>Orders</Text>
                 </View>
                 <View style={tw`flex-1 p-4 rounded-2xl bg-[${colors.surfaceElevated}] items-center`}>
-                    <Text style={[tw`text-2xl font-bold`, { color: colors.success }]}>
+                    <Text weight='bold' style={[tw`text-2xl`, { color: colors.success }]}>
                         ₦{totalSpent >= 1000
                             ? `${(totalSpent / 1000).toFixed(1)}k`
                             : totalSpent.toLocaleString()}
                     </Text>
-                    <Text style={tw`text-[${colors.textMuted}] text-[10px] mt-1`}>Total Spent</Text>
+                    <Text weight='medium' style={tw`text-[${colors.textMuted}] text-[10px] mt-1`}>Total Spent</Text>
                 </View>
             </View>
 
             {/* Personal info */}
             <View style={tw`mx-5 mb-4 rounded-2xl bg-[${colors.surfaceElevated}] overflow-hidden`}>
-                <Text style={tw`text-[${colors.textSecondary}] text-xs font-semibold uppercase tracking-widest px-4 pt-4 pb-2`}>
+                <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-4 pt-4 pb-2`}>
                     Personal Info
                 </Text>
                 <ProfileField
@@ -226,7 +226,7 @@ export default function CustomerProfileScreen() {
 
             {/* Default delivery address */}
             <View style={tw`mx-5 mb-4 rounded-2xl bg-[${colors.surfaceElevated}] overflow-hidden`}>
-                <Text style={tw`text-[${colors.textSecondary}] text-xs font-semibold uppercase tracking-widest px-4 pt-4 pb-2`}>
+                <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-4 pt-4 pb-2`}>
                     Default Address
                 </Text>
                 <ProfileField
@@ -241,7 +241,7 @@ export default function CustomerProfileScreen() {
 
             {/* Appearance */}
             <View style={tw`mx-5 mb-4 rounded-2xl bg-[${colors.surfaceElevated}] overflow-hidden`}>
-                <Text style={tw`text-[${colors.textSecondary}] text-xs font-semibold uppercase tracking-widest px-4 pt-4 pb-2`}>
+                <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-4 pt-4 pb-2`}>
                     Appearance
                 </Text>
                 <View style={tw`flex-row items-center px-4 py-3.5`}>
@@ -249,8 +249,8 @@ export default function CustomerProfileScreen() {
                         <Ionicons name="moon-outline" size={18} color={colors.textMuted} />
                     </View>
                     <View style={tw`flex-1`}>
-                        <Text style={tw`text-[${colors.textPrimary}] text-sm font-medium`}>Theme</Text>
-                        <Text style={tw`text-[${colors.textMuted}] text-xs`}>Dark • Coming soon</Text>
+                        <Text weight='medium' style={tw`text-[${colors.textPrimary}] text-sm`}>Theme</Text>
+                        <Text weight='medium' style={tw`text-[${colors.textMuted}] text-xs`}>Dark • Coming soon</Text>
                     </View>
                     <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
                 </View>
@@ -271,7 +271,7 @@ export default function CustomerProfileScreen() {
                             ? <ActivityIndicator size="small" color="white" />
                             : <Ionicons name="checkmark-circle-outline" size={18} color="white" />
                         }
-                        <Text style={tw`text-white font-bold`}>
+                        <Text weight='bold' style={tw`text-white`}>
                             {saving ? 'Saving...' : 'Save Changes'}
                         </Text>
                     </TouchableOpacity>
@@ -288,7 +288,7 @@ export default function CustomerProfileScreen() {
                     ]}
                 >
                     <Ionicons name="log-out-outline" size={18} color={colors.error} />
-                    <Text style={[tw`font-bold`, { color: colors.error }]}>Log Out</Text>
+                    <Text weight='bold' style={[tw`text-[${colors.error}]`, { color: colors.error }]}>Log Out</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>

@@ -1,13 +1,14 @@
 import React from 'react';
 import {
     View,
-    Text,
     TextInput,
     ScrollView,
+    // Text,
     TouchableOpacity,
     RefreshControl,
     FlatList,
 } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
@@ -101,7 +102,7 @@ export default function CustomerHome() {
                     <Text style={tw`text-[#A0A0A0] text-base`}>
                         {getGreeting()},
                     </Text>
-                    <Text style={tw`text-white text-2xl font-bold mt-1`}>
+                    <Text weight='bold' style={tw`text-white text-2xl mt-1`}>
                         {firstName} 👋
                     </Text>
                 </View>
@@ -146,7 +147,7 @@ export default function CustomerHome() {
                                 applyCategory(category, restaurants);
                             }}
                         >
-                            <Text style={tw`text-sm font-medium ${activeCategory === category ? 'text-white' : 'text-[#A0A0A0]'
+                            <Text weight='medium' style={tw`text-sm ${activeCategory === category ? 'text-white' : 'text-[#A0A0A0]'
                                 }`}>
                                 {category}
                             </Text>
@@ -162,7 +163,7 @@ export default function CustomerHome() {
                 </View>
 
                 {/* Restaurant List */}
-                <View style={tw`px-5 pb-6`}>
+                <View style={tw`px-5 pb-20`}>
                     {loading ? (
                         // Skeleton loading state
                         <>
@@ -174,7 +175,7 @@ export default function CustomerHome() {
                         // Empty state
                         <View style={tw`items-center justify-center py-20`}>
                             <Ionicons name="search-outline" size={48} color={colors.textMuted} />
-                            <Text style={tw`text-white font-semibold text-lg mt-4`}>
+                            <Text weight='semiBold' style={tw`text-white text-lg mt-4`}>
                                 No restaurants found
                             </Text>
                             <Text style={tw`text-[#A0A0A0] text-sm mt-2 text-center`}>

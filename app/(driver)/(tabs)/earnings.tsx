@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
+import { View, ScrollView, ActivityIndicator } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import { supabase } from '../../../services/supabase';
@@ -83,7 +84,7 @@ export default function EarningsScreen() {
         >
             {/* Header */}
             <View style={tw`px-5 pt-14 pb-5`}>
-                <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>Earnings</Text>
+                <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>Earnings</Text>
                 <Text style={tw`text-[${colors.textSecondary}] text-sm mt-0.5`}>
                     Your delivery income and stats at a glance
                 </Text>
@@ -106,7 +107,7 @@ export default function EarningsScreen() {
 
             {/* Delivery history */}
             <View style={tw`mx-5`}>
-                <Text style={tw`text-[${colors.textPrimary}] font-semibold mb-3`}>
+                <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] mb-3`}>
                     Delivery History
                 </Text>
 

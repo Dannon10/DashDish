@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import tw from 'twrnc';
 import colors from '../../../constants/colors';
 
@@ -28,8 +29,8 @@ export default function PeriodSelector({ value, onChange }: Props) {
                         value === p && { backgroundColor: colors.primary },
                     ]}
                 >
-                    <Text style={[
-                        tw`text-xs font-semibold`,
+                    <Text weight='semiBold' style={[
+                        tw`text-xs`,
                         { color: value === p ? colors.white : colors.textMuted },
                     ]}>
                         {LABELS[p]}

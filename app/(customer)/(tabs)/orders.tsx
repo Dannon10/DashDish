@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -24,12 +25,12 @@ function EmptyState({ onBrowse }: { onBrowse: () => void }) {
             <View style={tw`w-20 h-20 rounded-full bg-[${colors.surfaceElevated}] items-center justify-center mb-4`}>
                 <Ionicons name="receipt-outline" size={36} color={colors.textMuted} />
             </View>
-            <Text style={tw`text-[${colors.textPrimary}] text-lg font-bold mb-2`}>No orders yet</Text>
+            <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-lg mb-2`}>No orders yet</Text>
             <Text style={tw`text-[${colors.textSecondary}] text-sm text-center mb-6`}>
                 Your order history will appear here once you place your first order.
             </Text>
             <TouchableOpacity onPress={onBrowse} style={tw`bg-[${colors.primary}] px-6 py-3 rounded-xl`}>
-                <Text style={tw`text-white font-bold`}>Browse Restaurants</Text>
+                <Text weight='bold' style={tw`text-white`}>Browse Restaurants</Text>
             </TouchableOpacity>
         </View>
     );
@@ -96,7 +97,7 @@ export default function OrdersScreen() {
     return (
         <View style={tw`flex-1 bg-[${colors.background}]`}>
             <View style={tw`px-5 pt-14 pb-4`}>
-                <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>My Orders</Text>
+                <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>My Orders</Text>
                 {orders.length > 0 && (
                     <Text style={tw`text-[${colors.textSecondary}] text-sm mt-1`}>
                         {orders.length} order{orders.length !== 1 ? 's' : ''} total
@@ -121,7 +122,7 @@ export default function OrdersScreen() {
                 >
                     {activeOrders.length > 0 && (
                         <View style={tw`mb-2`}>
-                            <Text style={tw`text-[${colors.textSecondary}] text-xs font-semibold uppercase tracking-widest px-5 mb-3`}>
+                            <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-5 mb-3`}>
                                 In Progress
                             </Text>
                             {activeOrders.map((order) => (
@@ -132,7 +133,7 @@ export default function OrdersScreen() {
 
                     {pastOrders.length > 0 && (
                         <View>
-                            <Text style={tw`text-[${colors.textSecondary}] text-xs font-semibold uppercase tracking-widest px-5 mb-3 mt-2`}>
+                            <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-5 mb-3 mt-2`}>
                                 Past Orders
                             </Text>
                             {pastOrders.map((order) => (

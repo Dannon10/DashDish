@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Image } from 'react-native';
+import { Text } from '../components/ui/AppText';
 import { router } from 'expo-router';
 import React from 'react';
 import tw from 'twrnc';
@@ -29,7 +30,8 @@ export default function Index() {
 
   return (
     <View style={tw`flex-1 items-center justify-center bg-[#0A0A0A]`}>
-      <Text style={tw`text-white text-3xl font-bold mb-2`}>DashDish</Text>
+      <Image source={require('../assets/icon.png')} style={tw`w-30 h-30 mb-4`} />
+      <Text weight='bold' style={tw`text-white text-3xl mb-2`}>DashDish</Text>
       <Text style={tw`text-[#7C3AED] text-base mb-8`}>
         Food delivery, redefined
       </Text>

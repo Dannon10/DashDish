@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, TouchableOpacity,
+    Image} from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import tw from 'twrnc';
@@ -30,9 +32,14 @@ export default function RestaurantCard({ restaurant }: Props) {
                 )}
 
                 {/* Open/Closed Badge */}
-                <View style={tw`absolute top-3 right-3 px-2 py-1 rounded-full ${restaurant.is_open ? 'bg-green-500/20' : 'bg-red-500/20'
+                <View 
+                style={tw`absolute top-3 right-3 px-2 py-1 rounded-full 
+                    ${restaurant.is_open ? 'bg-green-500/20' : 'bg-red-500/20'
                     }`}>
-                    <Text style={tw`text-xs font-semibold ${restaurant.is_open ? 'text-green-400' : 'text-red-400'
+                    <Text 
+                        weight='semiBold'
+                        style={tw`text-xs 
+                            ${restaurant.is_open ? 'text-green-400' : 'text-red-400'
                         }`}>
                         {restaurant.is_open ? 'Open' : 'Closed'}
                     </Text>
@@ -42,13 +49,17 @@ export default function RestaurantCard({ restaurant }: Props) {
             {/* Restaurant Info */}
             <View style={tw`p-4`}>
                 <View style={tw`flex-row items-center justify-between mb-1`}>
-                    <Text style={tw`text-white font-bold text-lg flex-1`} numberOfLines={1}>
+                    <Text 
+                        variant='heading' 
+                        weight='bold'
+                        style={tw`text-white text-lg flex-1`} 
+                        numberOfLines={1}>
                         {restaurant.name}
                     </Text>
                     {/* Rating */}
                     <View style={tw`flex-row items-center gap-1`}>
                         <Ionicons name="star" size={14} color="#F59E0B" />
-                        <Text style={tw`text-[#F59E0B] text-sm font-semibold`}>
+                        <Text weight='semiBold' style={tw`text-[#F59E0B] text-sm`}>
                             {restaurant.rating.toFixed(1)}
                         </Text>
                     </View>

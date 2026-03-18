@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import {
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
     ActivityIndicator,
@@ -12,6 +11,7 @@ import {
     PanResponder,
     Dimensions,
 } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -69,10 +69,10 @@ function SwipeableCard({
         <View style={tw`relative mb-4 mx-5`}>
             <Animated.View style={[tw`absolute inset-0 rounded-2xl items-center justify-start flex-row pl-6`, { backgroundColor: colors.error, opacity: declineBgOpacity }]}>
                 <Ionicons name="close-circle" size={26} color="white" />
-                <Text style={tw`text-white font-bold text-sm ml-2`}>Decline</Text>
+                <Text weight='bold' style={tw`text-white text-sm ml-2`}>Decline</Text>
             </Animated.View>
             <Animated.View style={[tw`absolute inset-0 rounded-2xl items-center justify-end flex-row pr-6`, { backgroundColor: colors.success, opacity: acceptBgOpacity }]}>
-                <Text style={tw`text-white font-bold text-sm mr-2`}>Accept</Text>
+                <Text weight='bold' style={tw`text-white text-sm mr-2`}>Accept</Text>
                 <Ionicons name="checkmark-circle" size={26} color="white" />
             </Animated.View>
             <Animated.View style={{ transform: [{ translateX }], opacity }} {...panResponder.panHandlers}>
@@ -145,7 +145,7 @@ export default function DriverHomeScreen() {
             <View style={tw`px-5 pt-14 pb-4`}>
                 <View style={tw`flex-row items-center justify-between`}>
                     <View>
-                        <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>
                             {profile?.full_name?.split(' ')[0] ?? 'Driver'}
                         </Text>
                         <Text style={tw`text-[${colors.textSecondary}] text-sm mt-0.5`}>
@@ -172,7 +172,7 @@ export default function DriverHomeScreen() {
             >
                 <View style={tw`flex-row items-center gap-2`}>
                     <Ionicons name="bicycle" size={18} color="white" />
-                    <Text style={tw`text-white font-semibold text-sm`}>View Active Delivery</Text>
+                    <Text weight='semiBold' style={tw`text-white text-sm`}>View Active Delivery</Text>
                 </View>
                 <Ionicons name="arrow-forward" size={16} color="white" />
             </TouchableOpacity>
@@ -183,11 +183,11 @@ export default function DriverHomeScreen() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} colors={[colors.primary]} />}
             >
                 <View style={tw`flex-row items-center justify-between px-5 mb-3`}>
-                    <Text style={tw`text-[${colors.textSecondary}] text-xs font-semibold uppercase tracking-widest`}>
+                    <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest`}>
                         {orders.length > 0 ? `${orders.length} Available Order${orders.length !== 1 ? 's' : ''}` : 'No orders right now'}
                     </Text>
                     {orders.length > 0 && (
-                        <Text style={tw`text-[${colors.textMuted}] text-[10px]`}>swipe to accept / decline</Text>
+                        <Text weight='semiBold' style={tw`text-[${colors.textMuted}] text-[10px]`}>swipe to accept / decline</Text>
                     )}
                 </View>
 
@@ -196,8 +196,8 @@ export default function DriverHomeScreen() {
                         <View style={tw`w-20 h-20 rounded-full bg-[${colors.surfaceElevated}] items-center justify-center mb-4`}>
                             <Ionicons name="bicycle-outline" size={36} color={colors.textMuted} />
                         </View>
-                        <Text style={tw`text-[${colors.textPrimary}] text-lg font-bold mb-2`}>No orders yet</Text>
-                        <Text style={tw`text-[${colors.textSecondary}] text-sm text-center`}>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-lg mb-2`}>No orders yet</Text>
+                        <Text weight='medium' style={tw`text-[${colors.textSecondary}] text-sm text-center`}>
                             New orders will appear here automatically. Pull down to refresh.
                         </Text>
                     </View>

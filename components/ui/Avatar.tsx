@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import {
     View,
-    Text,
     Image,
     TouchableOpacity,
     ActivityIndicator,
     Platform,
 } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import tw from 'twrnc';
@@ -124,7 +124,7 @@ export default function Avatar({
                         style={{ width: size, height: size, borderRadius: size / 2 }}
                     />
                 ) : (
-                    <Text style={[tw`font-bold text-white`, { fontSize }]}>
+                    <Text weight='bold' style={[tw`text-white`, { fontSize }]}>
                         {initials}
                     </Text>
                 )}

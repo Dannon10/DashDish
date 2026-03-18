@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { View, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,14 +52,14 @@ export default function RestaurantDetail() {
         return (
             <View style={tw`flex-1 bg-[#0A0A0A] items-center justify-center px-6`}>
                 <Ionicons name="alert-circle-outline" size={48} color={colors.error} />
-                <Text style={tw`text-white font-semibold text-lg mt-4`}>
+                <Text weight='semiBold' style={tw`text-white text-lg mt-4`}>
                     Failed to load restaurant
                 </Text>
                 <TouchableOpacity
                     style={tw`mt-4 bg-[#7C3AED] px-6 py-3 rounded-xl`}
                     onPress={loadRestaurant}
                 >
-                    <Text style={tw`text-white font-semibold`}>Try Again</Text>
+                    <Text weight='semiBold' style={tw`text-white`}>Try Again</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -94,7 +95,7 @@ export default function RestaurantDetail() {
                     <View style={tw`absolute top-12 right-4 px-3 py-1 rounded-full ${
                         restaurant.is_open ? 'bg-green-500/20' : 'bg-red-500/20'
                     }`}>
-                        <Text style={tw`text-xs font-semibold ${
+                        <Text weight='semiBold' style={tw`text-xs ${
                             restaurant.is_open ? 'text-green-400' : 'text-red-400'
                         }`}>
                             {restaurant.is_open ? 'Open Now' : 'Closed'}
@@ -104,7 +105,7 @@ export default function RestaurantDetail() {
 
                 {/* Restaurant Info */}
                 <View style={tw`px-5 pt-5 pb-4 border-b border-[#1E1E1E]`}>
-                    <Text style={tw`text-white text-2xl font-bold mb-1`}>
+                    <Text weight='bold' style={tw`text-white text-2xl mb-1`}>
                         {restaurant.name}
                     </Text>
                     <Text style={tw`text-[#A0A0A0] text-sm mb-4`}>
@@ -113,7 +114,7 @@ export default function RestaurantDetail() {
                     <View style={tw`flex-row gap-5`}>
                         <View style={tw`flex-row items-center gap-1`}>
                             <Ionicons name="star" size={15} color="#F59E0B" />
-                            <Text style={tw`text-white font-semibold text-sm`}>
+                            <Text weight='semiBold' style={tw`text-white text-sm`}>
                                 {restaurant.rating.toFixed(1)}
                             </Text>
                         </View>
@@ -134,7 +135,7 @@ export default function RestaurantDetail() {
 
                 {/* Menu */}
                 <View style={tw`px-5 pt-5 pb-32`}>
-                    <Text style={tw`text-white font-bold text-xl mb-4`}>Menu</Text>
+                    <Text weight='bold' style={tw`text-white text-xl mb-4`}>Menu</Text>
                     {restaurant.menu_categories
                         .sort((a, b) => a.order_index - b.order_index)
                         .map(category => (
@@ -159,10 +160,10 @@ export default function RestaurantDetail() {
                         onPress={() => router.push('/(customer)/cart')}
                     >
                         <View style={tw`bg-[#5B21B6] w-7 h-7 rounded-full items-center justify-center`}>
-                            <Text style={tw`text-white font-bold text-xs`}>{cartItemCount}</Text>
+                            <Text weight='semiBold' style={tw`text-white text-xs`}>{cartItemCount}</Text>
                         </View>
-                        <Text style={tw`text-white font-bold text-base`}>View Cart</Text>
-                        <Text style={tw`text-white font-semibold text-base`}>
+                        <Text weight='bold' style={tw`text-white text-base`}>View Cart</Text>
+                        <Text weight='semiBold' style={tw`text-white text-base`}>
                             {formatCurrency(cartTotal)}
                         </Text>
                     </TouchableOpacity>

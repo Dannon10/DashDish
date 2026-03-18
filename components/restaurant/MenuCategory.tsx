@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import tw from 'twrnc';
 import { MenuCategoryWithItems } from '../../types/restaurant.types';
 import MenuItem from './MenuItem';
@@ -25,7 +26,7 @@ export default function MenuCategory({
 
     return (
         <View style={tw`mb-6`}>
-            <Text style={tw`text-white font-bold text-lg mb-2`}>
+            <Text weight='bold' style={tw`text-white text-lg mb-2`}>
                 {category.name}
             </Text>
             {availableItems.map(item => (

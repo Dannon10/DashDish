@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
     View,
-    Text,
     ScrollView,
     TouchableOpacity,
     Image,
     ActivityIndicator,
     Platform,
 } from 'react-native';
+import { Text } from '../../../components/ui/AppText';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import tw from 'twrnc';
 import { Ionicons } from '@expo/vector-icons';
@@ -175,7 +175,7 @@ export default function OrderTrackingScreen() {
             <Ionicons name="alert-circle-outline" size={48} color={colors.error} />
             <Text style={tw`text-[${colors.textPrimary}] text-lg mt-3`}>Order not found</Text>
             <TouchableOpacity onPress={() => router.back()} style={tw`mt-4`}>
-                <Text style={tw`text-[${colors.primary}] font-semibold`}>Go Back</Text>
+                <Text weight='semiBold' style={tw`text-[${colors.primary}]`}>Go Back</Text>
             </TouchableOpacity>
         </View>
     );
@@ -214,11 +214,11 @@ export default function OrderTrackingScreen() {
                 <View style={tw`flex-row items-center justify-between px-5 pt-4 pb-2`}>
                     <View>
                         <Text style={tw`text-[${colors.textSecondary}] text-xs mb-0.5`}>Estimated arrival</Text>
-                        <Text style={tw`text-[${colors.textPrimary}] text-2xl font-bold`}>{route ? formatETA(route.durationSeconds) : '—'}</Text>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>{route ? formatETA(route.durationSeconds) : '—'}</Text>
                         {route && <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>{formatDistance(route.distanceMeters)} away</Text>}
                     </View>
                     <View style={[tw`px-3 py-1.5 rounded-full`, { backgroundColor: `${accentColor}22` }]}>
-                        <Text style={[tw`text-sm font-semibold capitalize`, { color: accentColor }]}>{currentStatus.replace(/_/g, ' ')}</Text>
+                        <Text weight='semiBold' style={[tw`text-sm capitalize`, { color: accentColor }]}>{currentStatus.replace(/_/g, ' ')}</Text>
                     </View>
                 </View>
 
@@ -232,7 +232,7 @@ export default function OrderTrackingScreen() {
                             </View>
                         )}
                         <View style={tw`flex-1 ml-3`}>
-                            <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base`}>{driverProfile.full_name}</Text>
+                            <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-base`}>{driverProfile.full_name}</Text>
                             <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>Your delivery driver</Text>
                         </View>
                         {driverProfile.phone && (
@@ -244,7 +244,7 @@ export default function OrderTrackingScreen() {
                 )}
 
                 <View style={tw`mx-5 mt-5`}>
-                    <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base mb-4`}>Order Progress</Text>
+                    <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-base mb-4`}>Order Progress</Text>
                     {STATUS_STEPS.map((step, idx) => {
                         const isCompleted = idx < currentStepIdx;
                         const isActive = idx === currentStepIdx;
@@ -260,11 +260,11 @@ export default function OrderTrackingScreen() {
                                     {!isLast && <View style={[tw`w-0.5 flex-1 my-1`, { backgroundColor: isCompleted ? accentColor : colors.border, minHeight: 20 }]} />}
                                 </View>
                                 <View style={tw`flex-1 pb-5 justify-center`}>
-                                    <Text style={[tw`font-medium`, { color: isUpcoming ? colors.textMuted : isActive ? colors.textPrimary : colors.textSecondary, fontSize: isActive ? 15 : 14 }]}>
+                                    <Text weight='medium' style={[ { color: isUpcoming ? colors.textMuted : isActive ? colors.textPrimary : colors.textSecondary, fontSize: isActive ? 15 : 14 }]}>
                                         {step.label}
                                     </Text>
-                                    {isActive && <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>In progress...</Text>}
-                                    {isCompleted && <Text style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>Done ✓</Text>}
+                                    {isActive && <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>In progress...</Text>}
+                                    {isCompleted && <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs mt-0.5`}>Done ✓</Text>}
                                 </View>
                             </View>
                         );
@@ -272,7 +272,7 @@ export default function OrderTrackingScreen() {
                 </View>
 
                 <View style={tw`mx-5 mt-2`}>
-                    <Text style={tw`text-[${colors.textPrimary}] font-semibold text-base mb-3`}>{order.restaurants?.name}</Text>
+                    <Text weight='semiBold' style={tw`text-[${colors.textPrimary}] text-base mb-3`}>{order.restaurants?.name}</Text>
                     {order.order_items?.map((item) => (
                         <View key={item.id} style={tw`flex-row justify-between py-1.5`}>
                             <Text style={tw`text-[${colors.textSecondary}] text-sm`}>{item.quantity}× {item.menu_items?.name}</Text>
@@ -280,8 +280,8 @@ export default function OrderTrackingScreen() {
                         </View>
                     ))}
                     <View style={tw`flex-row justify-between pt-3 mt-1 border-t border-[${colors.border}]`}>
-                        <Text style={tw`text-[${colors.textPrimary}] font-semibold`}>Total</Text>
-                        <Text style={tw`text-[${colors.textPrimary}] font-semibold`}>₦{order.total_amount.toLocaleString()}</Text>
+                        <Text weight='semiBold' style={tw`text-[${colors.textPrimary}]`}>Total</Text>
+                        <Text weight='semiBold' style={tw`text-[${colors.textPrimary}]`}>₦{order.total_amount.toLocaleString()}</Text>
                     </View>
                 </View>
             </ScrollView>

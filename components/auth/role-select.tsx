@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import { UserRole } from '../../types/auth.types';
@@ -21,11 +22,10 @@ export default function RoleSelect({ role, setRole }: Props) {
 
                 {/* Customer */}
                 <TouchableOpacity
-                    style={tw`flex-1 p-4 rounded-xl border-2 items-center ${
-                        role === 'customer'
+                    style={tw`flex-1 p-4 rounded-xl border-2 items-center ${role === 'customer'
                             ? 'border-[#7C3AED] bg-[#7C3AED]/10'
                             : 'border-[#2A2A2A] bg-[#141414]'
-                    }`}
+                        }`}
                     onPress={() => setRole('customer')}
                 >
                     <Ionicons
@@ -35,11 +35,11 @@ export default function RoleSelect({ role, setRole }: Props) {
                     />
 
                     <Text
-                        style={tw`mt-2 font-semibold ${
-                            role === 'customer'
+                        weight='semiBold'
+                        style={tw`mt-2 ${role === 'customer'
                                 ? 'text-[#7C3AED]'
                                 : 'text-[#A0A0A0]'
-                        }`}
+                            }`}
                     >
                         Order Food
                     </Text>
@@ -51,11 +51,10 @@ export default function RoleSelect({ role, setRole }: Props) {
 
                 {/* Driver */}
                 <TouchableOpacity
-                    style={tw`flex-1 p-4 rounded-xl border-2 items-center ${
-                        role === 'driver'
+                    style={tw`flex-1 p-4 rounded-xl border-2 items-center ${role === 'driver'
                             ? 'border-[#7C3AED] bg-[#7C3AED]/10'
                             : 'border-[#2A2A2A] bg-[#141414]'
-                    }`}
+                        }`}
                     onPress={() => setRole('driver')}
                 >
                     <Ionicons
@@ -65,11 +64,11 @@ export default function RoleSelect({ role, setRole }: Props) {
                     />
 
                     <Text
-                        style={tw`mt-2 font-semibold ${
-                            role === 'driver'
+                        weight='semiBold'
+                        style={tw`mt-2 ${role === 'driver'
                                 ? 'text-[#7C3AED]'
                                 : 'text-[#A0A0A0]'
-                        }`}
+                            }`}
                     >
                         Deliver Food
                     </Text>

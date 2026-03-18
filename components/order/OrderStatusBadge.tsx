@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View} from 'react-native';
+import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 
@@ -50,7 +51,7 @@ export default function OrderStatusBadge({ status }: Props) {
             ]}
         >
             <Ionicons name={STATUS_ICON[status] as any} size={12} color={color} />
-            <Text style={[tw`text-xs font-semibold`, { color }]}>
+            <Text weight='semiBold' style={[tw`text-xs`, { color }]}>
                 {STATUS_LABEL[status]}
             </Text>
         </View>
