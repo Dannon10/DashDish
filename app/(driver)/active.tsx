@@ -22,6 +22,7 @@ import useDriverStore from '../../store/useDriverStore';
 import DeliveryMap from '../../components/maps/DeliveryMap';
 import colors from '../../constants/colors';
 import type { OrderStatus } from '../../types/database.types';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 const NEXT_STATUS: Partial<Record<OrderStatus, { status: 'picked_up' | 'on_the_way' | 'delivered'; label: string; icon: string; color: string }>> = {
     confirmed:  { status: 'picked_up',  label: 'Mark as Picked Up',  icon: 'bag-handle-outline',  color: colors.statusPickedUp },
@@ -158,6 +159,7 @@ export default function DriverActiveScreen() {
     );
 
     return (
+        <ErrorBoundary onGoBack={() => router.back()}>
         <View style={tw`flex-1 bg-[${colors.background}]`}>
             <View style={tw`h-[45%]`}>
                 <DeliveryMap
@@ -261,5 +263,6 @@ export default function DriverActiveScreen() {
                 )}
             </ScrollView>
         </View>
+        </ErrorBoundary>
     );
 }

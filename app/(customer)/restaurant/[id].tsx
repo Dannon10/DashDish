@@ -1,7 +1,7 @@
 import React from "react";
 import { View, ScrollView, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Text } from '../../../components/ui/AppText';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router} from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -11,6 +11,7 @@ import MenuCategory from '../../../components/restaurant/MenuCategory';
 import useCartStore from '../../../store/useCartStore';
 import formatCurrency from '../../../utils/formatCurrency';
 import colors from '../../../constants/colors';
+import ErrorBoundary from "../../../components/ErrorBoundary";
 
 export default function RestaurantDetail() {
     const { id } = useLocalSearchParams<{ id: string }>();
@@ -66,8 +67,9 @@ export default function RestaurantDetail() {
     }
 
     return (
-        <View style={tw`flex-1 bg-[#0A0A0A]`}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+        <ErrorBoundary onGoBack={() => router.back()}>
+            <View style={tw`flex-1 bg-[#0A0A0A]`}>
+                <ScrollView showsVerticalScrollIndicator={false}>
 
                 {/* Hero Image */}
                 <View style={tw`h-80 bg-[#141414] relative`}>
@@ -170,5 +172,6 @@ export default function RestaurantDetail() {
                 </View>
             )}
         </View>
+        </ErrorBoundary>
     );
 }

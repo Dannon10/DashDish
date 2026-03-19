@@ -13,6 +13,7 @@ import OrderStatusBar from '../../../components/order/OrderStatusBar';
 import OrderCard from '../../../components/order/OrderCard';
 import type { OrderWithItems } from '../../../types/order.types';
 import type { OrderStatus } from '../../../types/database.types';
+import ErrorBoundary from '../../../components/ErrorBoundary';
 
 const ACTIVE_STATUSES: OrderStatus[] = [
     'placed', 'confirmed', 'preparing', 'picked_up', 'on_the_way'
@@ -95,54 +96,56 @@ export default function OrdersScreen() {
     }
 
     return (
-        <View style={tw`flex-1 bg-[${colors.background}]`}>
-            <View style={tw`px-5 pt-14 pb-4`}>
-                <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>My Orders</Text>
-                {orders.length > 0 && (
-                    <Text style={tw`text-[${colors.textSecondary}] text-sm mt-1`}>
-                        {orders.length} order{orders.length !== 1 ? 's' : ''} total
-                    </Text>
+        <ErrorBoundary>
+            <View style={tw`flex-1 bg-[${colors.background}]`}>
+                <View style={tw`px-5 pt-14 pb-4`}>
+                    <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-2xl`}>My Orders</Text>
+                    {orders.length > 0 && (
+                        <Text style={tw`text-[${colors.textSecondary}] text-sm mt-1`}>
+                            {orders.length} order{orders.length !== 1 ? 's' : ''} total
+                        </Text>
+                    )}
+                </View>
+
+                {orders.length === 0 ? (
+                    <EmptyState onBrowse={() => router.push('/(customer)/(tabs)')} />
+                ) : (
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        contentContainerStyle={tw`pb-32`}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                                tintColor={colors.primary}
+                                colors={[colors.primary]}
+                            />
+                        }
+                    >
+                        {activeOrders.length > 0 && (
+                            <View style={tw`mb-2`}>
+                                <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-5 mb-3`}>
+                                    In Progress
+                                </Text>
+                                {activeOrders.map((order) => (
+                                    <OrderStatusBar key={order.id} order={order} onPress={() => handleOrderPress(order)} />
+                                ))}
+                            </View>
+                        )}
+
+                        {pastOrders.length > 0 && (
+                            <View>
+                                <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-5 mb-3 mt-2`}>
+                                    Past Orders
+                                </Text>
+                                {pastOrders.map((order) => (
+                                    <OrderCard key={order.id} order={order} onPress={() => handleOrderPress(order)} />
+                                ))}
+                            </View>
+                        )}
+                    </ScrollView>
                 )}
             </View>
-
-            {orders.length === 0 ? (
-                <EmptyState onBrowse={() => router.push('/(customer)/(tabs)')} />
-            ) : (
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    contentContainerStyle={tw`pb-32`}
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={onRefresh}
-                            tintColor={colors.primary}
-                            colors={[colors.primary]}
-                        />
-                    }
-                >
-                    {activeOrders.length > 0 && (
-                        <View style={tw`mb-2`}>
-                            <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-5 mb-3`}>
-                                In Progress
-                            </Text>
-                            {activeOrders.map((order) => (
-                                <OrderStatusBar key={order.id} order={order} onPress={() => handleOrderPress(order)} />
-                            ))}
-                        </View>
-                    )}
-
-                    {pastOrders.length > 0 && (
-                        <View>
-                            <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest px-5 mb-3 mt-2`}>
-                                Past Orders
-                            </Text>
-                            {pastOrders.map((order) => (
-                                <OrderCard key={order.id} order={order} onPress={() => handleOrderPress(order)} />
-                            ))}
-                        </View>
-                    )}
-                </ScrollView>
-            )}
-        </View>
+        </ErrorBoundary>
     );
 }

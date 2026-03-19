@@ -10,11 +10,8 @@ interface Coords {
  *
  * Takes raw GPS coordinates (which update every ~2s) and returns a
  * smoothly interpolated position that updates every animation frame.
- * This gives Uber-style smooth marker movement on the map.
- *
  * @param target - The latest raw GPS coordinate from Supabase Realtime
- * @param durationMs - How long to animate between two points (default 1800ms,
- *                     slightly less than the 2s update interval)
+ * @param durationMs
  */
 export function useSmoothedLocation(
     target: Coords | null,

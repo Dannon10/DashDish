@@ -41,8 +41,16 @@ function SwipeableCard({
     const translateX = useRef(new Animated.Value(0)).current;
     const opacity = useRef(new Animated.Value(1)).current;
 
-    const declineBgOpacity = translateX.interpolate({ inputRange: [-SWIPE_THRESHOLD, 0], outputRange: [1, 0], extrapolate: 'clamp' });
-    const acceptBgOpacity = translateX.interpolate({ inputRange: [0, SWIPE_THRESHOLD], outputRange: [0, 1], extrapolate: 'clamp' });
+    const declineBgOpacity = translateX.interpolate({
+        inputRange: [-SWIPE_THRESHOLD, 0],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+    });
+    const acceptBgOpacity = translateX.interpolate({
+        inputRange: [0, SWIPE_THRESHOLD],
+        outputRange: [0, 1],
+        extrapolate: 'clamp',
+    });
 
     const flyOff = (toValue: number, callback: () => void) => {
         Animated.parallel([
@@ -51,11 +59,18 @@ function SwipeableCard({
         ]).start(() => callback());
     };
 
-    const snapBack = () => Animated.spring(translateX, { toValue: 0, useNativeDriver: true, tension: 120, friction: 8 }).start();
+    const snapBack = () =>
+        Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+            tension: 120,
+            friction: 8,
+        }).start();
 
     const panResponder = useRef(
         PanResponder.create({
-            onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy),
+            onMoveShouldSetPanResponder: (_, g) =>
+                Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy),
             onPanResponderMove: (_, g) => translateX.setValue(g.dx),
             onPanResponderRelease: (_, g) => {
                 if (g.dx < -SWIPE_THRESHOLD) flyOff(-SCREEN_WIDTH, onDecline);
@@ -67,15 +82,28 @@ function SwipeableCard({
 
     return (
         <View style={tw`relative mb-4 mx-5`}>
-            <Animated.View style={[tw`absolute inset-0 rounded-2xl items-center justify-start flex-row pl-6`, { backgroundColor: colors.error, opacity: declineBgOpacity }]}>
+            <Animated.View
+                style={[
+                    tw`absolute inset-0 rounded-2xl items-center justify-start flex-row pl-6`,
+                    { backgroundColor: colors.error, opacity: declineBgOpacity },
+                ]}
+            >
                 <Ionicons name="close-circle" size={26} color="white" />
                 <Text weight='bold' style={tw`text-white text-sm ml-2`}>Decline</Text>
             </Animated.View>
-            <Animated.View style={[tw`absolute inset-0 rounded-2xl items-center justify-end flex-row pr-6`, { backgroundColor: colors.success, opacity: acceptBgOpacity }]}>
+            <Animated.View
+                style={[
+                    tw`absolute inset-0 rounded-2xl items-center justify-end flex-row pr-6`,
+                    { backgroundColor: colors.success, opacity: acceptBgOpacity },
+                ]}
+            >
                 <Text weight='bold' style={tw`text-white text-sm mr-2`}>Accept</Text>
                 <Ionicons name="checkmark-circle" size={26} color="white" />
             </Animated.View>
-            <Animated.View style={{ transform: [{ translateX }], opacity }} {...panResponder.panHandlers}>
+            <Animated.View
+                style={{ transform: [{ translateX }], opacity }}
+                {...panResponder.panHandlers}
+            >
                 {children}
             </Animated.View>
         </View>
@@ -86,10 +114,10 @@ function SwipeableCard({
 export default function DriverHomeScreen() {
     const router = useRouter();
     const { profile } = useAuthStore();
-    const { isOnline, setOnline, setActiveDelivery, currentLocation } = useDriverStore();
+    const { isOnline, setOnline, setActiveDelivery, activeDelivery, currentLocation } = useDriverStore();
 
-    // useDriver hook handles orders + Realtime + decline
-    const { orders, loading, refreshing, refresh, decline } = useDriver();
+    // Pass profile.id so declined orders are filtered from DB on every fetch
+    const { orders, loading, refreshing, refresh, decline } = useDriver(profile?.id);
 
     const [acceptingId, setAcceptingId] = useState<string | null>(null);
     const cancelSimRef = useRef<(() => void) | null>(null);
@@ -126,7 +154,10 @@ export default function DriverHomeScreen() {
         cancelSimRef.current = startDeliverySimulation({
             orderId: order.id,
             driverId: SIMULATED_DRIVER_ID,
-            restaurantCoords: { lat: order.restaurants?.lat ?? 6.5244, lng: order.restaurants?.lng ?? 3.3792 },
+            restaurantCoords: {
+                lat: order.restaurants?.lat ?? 6.5244,
+                lng: order.restaurants?.lng ?? 3.3792,
+            },
             deliveryCoords: { lat: order.delivery_lat, lng: order.delivery_lng },
             onComplete: () => setAcceptingId(null),
         });
@@ -142,6 +173,7 @@ export default function DriverHomeScreen() {
 
     return (
         <View style={tw`flex-1 bg-[${colors.background}]`}>
+            {/* Header */}
             <View style={tw`px-5 pt-14 pb-4`}>
                 <View style={tw`flex-row items-center justify-between`}>
                     <View>
@@ -166,28 +198,41 @@ export default function DriverHomeScreen() {
                 </View>
             </View>
 
-            <TouchableOpacity
-                onPress={() => router.push('/(driver)/active')}
-                style={tw`mx-5 mb-4 p-3 rounded-xl bg-[${colors.primary}] flex-row items-center justify-between`}
-            >
-                <View style={tw`flex-row items-center gap-2`}>
-                    <Ionicons name="bicycle" size={18} color="white" />
-                    <Text weight='semiBold' style={tw`text-white text-sm`}>View Active Delivery</Text>
-                </View>
-                <Ionicons name="arrow-forward" size={16} color="white" />
-            </TouchableOpacity>
+            {activeDelivery && (
+                <TouchableOpacity
+                    onPress={() => router.push('/(driver)/active')}
+                    style={tw`mx-5 mb-4 p-3 rounded-xl bg-[${colors.primary}] flex-row items-center justify-between`}
+                >
+                    <View style={tw`flex-row items-center gap-2`}>
+                        <Ionicons name="bicycle" size={18} color="white" />
+                        <Text weight='semiBold' style={tw`text-white text-sm`}>View Active Delivery</Text>
+                    </View>
+                    <Ionicons name="arrow-forward" size={16} color="white" />
+                </TouchableOpacity>
+            )}
 
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={tw`pb-32`}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor={colors.primary} colors={[colors.primary]} />}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={refresh}
+                        tintColor={colors.primary}
+                        colors={[colors.primary]}
+                    />
+                }
             >
                 <View style={tw`flex-row items-center justify-between px-5 mb-3`}>
                     <Text weight='semiBold' style={tw`text-[${colors.textSecondary}] text-xs uppercase tracking-widest`}>
-                        {orders.length > 0 ? `${orders.length} Available Order${orders.length !== 1 ? 's' : ''}` : 'No orders right now'}
+                        {orders.length > 0
+                            ? `${orders.length} Available Order${orders.length !== 1 ? 's' : ''}`
+                            : 'No orders right now'}
                     </Text>
                     {orders.length > 0 && (
-                        <Text weight='semiBold' style={tw`text-[${colors.textMuted}] text-[10px]`}>swipe to accept / decline</Text>
+                        <Text style={tw`text-[${colors.textMuted}] text-[10px]`}>
+                            swipe to accept / decline
+                        </Text>
                     )}
                 </View>
 
@@ -196,8 +241,10 @@ export default function DriverHomeScreen() {
                         <View style={tw`w-20 h-20 rounded-full bg-[${colors.surfaceElevated}] items-center justify-center mb-4`}>
                             <Ionicons name="bicycle-outline" size={36} color={colors.textMuted} />
                         </View>
-                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-lg mb-2`}>No orders yet</Text>
-                        <Text weight='medium' style={tw`text-[${colors.textSecondary}] text-sm text-center`}>
+                        <Text weight='bold' style={tw`text-[${colors.textPrimary}] text-lg mb-2`}>
+                            No orders yet
+                        </Text>
+                        <Text style={tw`text-[${colors.textSecondary}] text-sm text-center`}>
                             New orders will appear here automatically. Pull down to refresh.
                         </Text>
                     </View>
@@ -206,13 +253,21 @@ export default function DriverHomeScreen() {
                         <SwipeableCard
                             key={order.id}
                             onDecline={() => decline(order.id)}
-                            onAccept={() => profile?.role === 'driver' ? handleAccept(order) : handleSimulate(order)}
+                            onAccept={() =>
+                                profile?.role === 'driver'
+                                    ? handleAccept(order)
+                                    : handleSimulate(order)
+                            }
                         >
                             <RequestCard
                                 order={order}
                                 isSimulated={profile?.role !== 'driver'}
                                 isLoading={acceptingId === order.id}
-                                onAccept={() => profile?.role === 'driver' ? handleAccept(order) : handleSimulate(order)}
+                                onAccept={() =>
+                                    profile?.role === 'driver'
+                                        ? handleAccept(order)
+                                        : handleSimulate(order)
+                                }
                                 onDecline={() => decline(order.id)}
                                 noMargin
                             />

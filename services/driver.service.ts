@@ -2,12 +2,22 @@ import { supabase } from './supabase';
 import { OrderWithItems } from '../types/order.types';
 import { DriverLocation } from '../types/driver.types';
 
-// Get pending orders (available for drivers to accept)
-export async function getPendingOrders(): Promise<{
+// Get pending orders — excludes orders this driver has already declined
+export async function getPendingOrders(driverId?: string): Promise<{
     data: OrderWithItems[];
     error: string | null;
 }> {
-    const { data, error } = await supabase
+    // Fetch declined order IDs for this driver first
+    let declinedIds: string[] = [];
+    if (driverId) {
+        const { data: declined } = await supabase
+            .from('declined_orders')
+            .select('order_id')
+            .eq('driver_id', driverId);
+        declinedIds = (declined ?? []).map((d) => d.order_id);
+    }
+
+    let query = supabase
         .from('orders')
         .select(`
             *,
@@ -18,6 +28,12 @@ export async function getPendingOrders(): Promise<{
         .is('driver_id', null)
         .order('created_at', { ascending: false });
 
+    // Exclude declined orders
+    if (declinedIds.length > 0) {
+        query = query.not('id', 'in', `(${declinedIds.join(',')})`);
+    }
+
+    const { data, error } = await query;
     if (error) return { data: [], error: error.message };
     return { data: data as OrderWithItems[], error: null };
 }
@@ -35,14 +51,27 @@ export async function acceptOrder(
             updated_at: new Date().toISOString(),
         })
         .eq('id', orderId)
-        .is('driver_id', null); // prevent double-accept
+        .is('driver_id', null);
 
     if (error) return { error: error.message };
     return { error: null };
 }
 
-// Decline / ignore an order (no DB change needed, just UI)
-// Real decline logic could insert into a 'declined_orders' table if needed
+// Decline an order — persists to Supabase so it survives logout
+export async function declineOrder(
+    orderId: string,
+    driverId: string
+): Promise<{ error: string | null }> {
+    const { error } = await supabase
+        .from('declined_orders')
+        .insert({ order_id: orderId, driver_id: driverId });
+
+    // Ignore unique constraint violations (already declined)
+    if (error && !error.message.includes('duplicate') && !error.code?.includes('23505')) {
+        return { error: error.message };
+    }
+    return { error: null };
+}
 
 // Update order status as driver
 export async function updateDeliveryStatus(
@@ -87,7 +116,7 @@ export async function upsertDriverLocation(
     return { error: null };
 }
 
-// Get driver's active delivery 
+// Get driver's active delivery
 export async function getActiveDelivery(
     driverId: string
 ): Promise<{ data: OrderWithItems | null; error: string | null }> {
@@ -108,7 +137,7 @@ export async function getActiveDelivery(
     return { data: data as OrderWithItems, error: null };
 }
 
-// Get driver earnings 
+// Get driver earnings
 export async function getDriverEarnings(
     driverId: string
 ): Promise<{ total: number; today: number; error: string | null }> {

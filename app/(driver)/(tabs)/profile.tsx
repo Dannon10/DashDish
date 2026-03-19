@@ -16,6 +16,8 @@ import useAuthStore from '../../../store/useAuthStore';
 import useDriverStore from '../../../store/useDriverStore';
 import Avatar from '../../../components/ui/Avatar';
 import colors from '../../../constants/colors';
+import ErrorBoundary from '../../../components/ErrorBoundary';
+import { useRouter } from 'expo-router';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -79,12 +81,12 @@ function FieldRow({
 export default function DriverProfileScreen() {
     const { profile, setProfile } = useAuthStore();
     const { isOnline, setOnline } = useDriverStore();
-
     const [fullName, setFullName] = useState(profile?.full_name ?? '');
     const [phone, setPhone] = useState(profile?.phone ?? '');
     const [vehicleInfo, setVehicleInfo] = useState((profile as any)?.vehicle_info ?? '');
     const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url ?? null);
     const [saving, setSaving] = useState(false);
+    const router = useRouter();
 
     const isDirty =
         fullName !== (profile?.full_name ?? '') ||
@@ -122,6 +124,7 @@ export default function DriverProfileScreen() {
     if (!profile) return null;
 
     return (
+        <ErrorBoundary>
         <ScrollView
             style={tw`flex-1 bg-[${colors.background}]`}
             contentContainerStyle={tw`pb-32`}
@@ -225,5 +228,6 @@ export default function DriverProfileScreen() {
                 </TouchableOpacity>
             </View>
         </ScrollView>
+        </ErrorBoundary>
     );
 }

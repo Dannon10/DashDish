@@ -3,7 +3,6 @@ import { View} from 'react-native';
 import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-
 import colors from '../../constants/colors';
 import type { OrderStatus } from '../../types/database.types';
 

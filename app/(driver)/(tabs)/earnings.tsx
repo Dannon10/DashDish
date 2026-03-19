@@ -13,6 +13,7 @@ import EarningsStats from '../../../components/driver/earnings/EarningsStats';
 import WeeklyBarChart from '../../../components/driver/earnings/BarChart';
 import DeliveryRow from '../../../components/driver/earnings/DeliveryRow';
 import type { OrderWithItems } from '../../../types/order.types';
+import ErrorBoundary from '../../../components/ErrorBoundary';
 
 export default function EarningsScreen() {
     const { profile } = useAuthStore();
@@ -77,6 +78,8 @@ export default function EarningsScreen() {
     }
 
     return (
+        <ErrorBoundary>
+
         <ScrollView
             style={tw`flex-1 bg-[${colors.background}]`}
             contentContainerStyle={tw`pb-32`}
@@ -133,5 +136,6 @@ export default function EarningsScreen() {
                 )}
             </View>
         </ScrollView>
+        </ErrorBoundary>
     );
 }
