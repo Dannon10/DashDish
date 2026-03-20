@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-    View,
-    ScrollView,
-    TouchableOpacity,
-    TextInput,
-    Alert,
-    ActivityIndicator,
-    Switch,
-} from 'react-native';
+import { View, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Switch } from 'react-native';
 import { Text } from '../../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -16,8 +8,11 @@ import useAuthStore from '../../../store/useAuthStore';
 import useDriverStore from '../../../store/useDriverStore';
 import Avatar from '../../../components/ui/Avatar';
 import colors from '../../../constants/colors';
+import FieldRow from '../../../components/driver/profile/FieldRow';
 import ErrorBoundary from '../../../components/ErrorBoundary';
 import { useRouter } from 'expo-router';
+// import type { DriverProfile } from '../../../hooks/useDriverProfile';
+
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -27,52 +22,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
             </Text>
             <View style={[tw`rounded-2xl overflow-hidden`, { backgroundColor: colors.surfaceElevated }]}>
                 {children}
-            </View>
-        </View>
-    );
-}
-
-function FieldRow({
-    icon,
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    isLast = false,
-    keyboardType = 'default',
-}: {
-    icon: string;
-    label: string;
-    value: string;
-    onChangeText?: (t: string) => void;
-    placeholder?: string;
-    isLast?: boolean;
-    keyboardType?: any;
-}) {
-    return (
-        <View style={[
-            tw`flex-row items-center px-4 py-3.5`,
-            !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border },
-        ]}>
-            <View style={tw`w-8 h-8 rounded-full bg-[${colors.primary}22] items-center justify-center mr-3`}>
-                <Ionicons name={icon as any} size={16} color={colors.primary} />
-            </View>
-            <View style={tw`flex-1`}>
-                <Text style={tw`text-[${colors.textMuted}] text-[10px] uppercase tracking-widest mb-0.5`}>
-                    {label}
-                </Text>
-                {onChangeText ? (
-                    <TextInput
-                        value={value}
-                        onChangeText={onChangeText}
-                        placeholder={placeholder ?? `Enter ${label.toLowerCase()}`}
-                        placeholderTextColor={colors.textMuted}
-                        keyboardType={keyboardType}
-                        style={[tw`text-[${colors.textPrimary}] text-sm p-0`]}
-                    />
-                ) : (
-                    <Text style={tw`text-[${colors.textSecondary}] text-sm`}>{value || placeholder}</Text>
-                )}
             </View>
         </View>
     );

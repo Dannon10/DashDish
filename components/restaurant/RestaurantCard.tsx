@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity,
-    Image} from 'react-native';
+import { View, TouchableOpacity, Image} from 'react-native';
 import { Text } from '../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -72,16 +71,16 @@ export default function RestaurantCard({ restaurant }: Props) {
                 {/* Category + Delivery Time */}
                 <View style={tw`flex-row items-center gap-4`}>
                     <View style={tw`flex-row items-center gap-1`}>
-                        <Ionicons name="pricetag-outline" size={13} color={colors.textMuted} />
-                        <Text style={tw`text-[#555555] text-xs`}>{restaurant.category}</Text>
+                        <Ionicons name="pricetag-outline" size={13} color={colors.textSecondary} />
+                        <Text style={tw`text-[#A0A0A0] text-xs`}>{restaurant.category}</Text>
                     </View>
                     <View style={tw`flex-row items-center gap-1`}>
-                        <Ionicons name="time-outline" size={13} color={colors.textMuted} />
-                        <Text style={tw`text-[#555555] text-xs`}>{restaurant.delivery_time} mins</Text>
+                        <Ionicons name="time-outline" size={13} color={colors.textSecondary} />
+                        <Text style={tw`text-[#A0A0A0] text-xs`}>{restaurant.delivery_time} mins</Text>
                     </View>
                     <View style={tw`flex-row items-center gap-1`}>
-                        <Ionicons name="location-outline" size={13} color={colors.textMuted} />
-                        <Text style={tw`text-[#555555] text-xs`} numberOfLines={1}>
+                        <Ionicons name="location-outline" size={13} color={colors.textSecondary} />
+                        <Text style={tw`text-[#A0A0A0] text-xs`} numberOfLines={1}>
                             {restaurant.address.split(',')[0]}
                         </Text>
                     </View>

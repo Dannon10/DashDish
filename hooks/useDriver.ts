@@ -11,12 +11,6 @@ interface Result {
     decline: (orderId: string) => void;
 }
 
-/**
- * Fetches pending orders (placed, no driver) and subscribes to Realtime.
- * Decline is persisted to Supabase so it survives logout/login.
- * declinedIdsRef is kept as an optimistic local filter so the card
- * disappears instantly before the DB write completes.
- */
 export function useDriver(driverId?: string): Result {
     const [orders, setOrders] = useState<OrderWithItems[]>([]);
     const [loading, setLoading] = useState(true);

@@ -11,6 +11,7 @@ import { Text } from '../AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
 import colors from '../../../constants/colors';
+import { router } from 'expo-router';
 
 interface Props {
     visible: boolean;
@@ -55,6 +56,7 @@ export default function RatingModal({ visible, driverProfile, onSubmit, onSkip }
         setSubmitting(true);
         await onSubmit(selected);
         setSubmitting(false);
+        router.replace('/(customer)/');
     };
 
     return (

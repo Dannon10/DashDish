@@ -10,7 +10,7 @@ interface Coords {
 interface Options {
     driverId: string | undefined;
     initialCoords?: Coords | null;
-    enabled?: boolean; // set false when offline
+    enabled?: boolean;
 }
 
 interface Result {

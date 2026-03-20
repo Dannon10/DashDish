@@ -27,16 +27,16 @@ export async function getRoute(
     origin: Coordinates,
     destination: Coordinates
 ): Promise<RouteResult | null> {
-    // Guard: reject invalid or zero coordinates
     if (
-        !origin?.lat || !origin?.lng ||
-        !destination?.lat || !destination?.lng ||
-        isNaN(origin.lat) || isNaN(origin.lng) ||
-        isNaN(destination.lat) || isNaN(destination.lng)
-    ) {
-        console.warn('[mapbox] getRoute skipped — invalid coordinates', { origin, destination });
-        return null;
-    }
+    origin == null || destination == null ||
+    !isFinite(origin.lat) || !isFinite(origin.lng) ||
+    !isFinite(destination.lat) || !isFinite(destination.lng) ||
+    (origin.lat === 0 && origin.lng === 0) ||
+    (destination.lat === 0 && destination.lng === 0)
+) {
+    console.warn('[mapbox] getRoute skipped — invalid coordinates', { origin, destination });
+    return null;
+}
 
     try {
         const url =
@@ -44,8 +44,17 @@ export async function getRoute(
             `${origin.lng},${origin.lat};${destination.lng},${destination.lat}` +
             `?geometries=geojson&overview=full&access_token=${MAPBOX_TOKEN}`;
 
+        // const res = await fetch(url);
+        // if (!res.ok) throw new Error(`Directions API error: ${res.status}`);
+
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`Directions API error: ${res.status}`);
+if (!res.ok) {
+    if (res.status === 422) {
+        console.warn('[mapbox] getRoute skipped — coordinates too far apart or invalid');
+        return null;
+    }
+    throw new Error(`Directions API error: ${res.status}`);
+}
 
         const data = await res.json();
         const route = data.routes?.[0];

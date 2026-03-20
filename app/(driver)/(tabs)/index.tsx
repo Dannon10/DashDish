@@ -110,15 +110,11 @@ function SwipeableCard({
     );
 }
 
-// Main screen
 export default function DriverHomeScreen() {
     const router = useRouter();
     const { profile } = useAuthStore();
     const { isOnline, setOnline, setActiveDelivery, activeDelivery, currentLocation } = useDriverStore();
-
-    // Pass profile.id so declined orders are filtered from DB on every fetch
     const { orders, loading, refreshing, refresh, decline } = useDriver(profile?.id);
-
     const [acceptingId, setAcceptingId] = useState<string | null>(null);
     const cancelSimRef = useRef<(() => void) | null>(null);
 
@@ -130,19 +126,19 @@ export default function DriverHomeScreen() {
     };
 
     const handleAccept = async (order: OrderWithItems) => {
-        if (!profile?.id) return;
-        setAcceptingId(order.id);
-        const { error } = await acceptOrder(order.id, profile.id);
-        if (error) {
-            Alert.alert('Error', 'Could not accept order. It may have been taken.');
-            setAcceptingId(null);
-            await refresh();
-            return;
-        }
-        setActiveDelivery(order);
+    if (!profile?.id) return;
+    setAcceptingId(order.id);
+    const { error } = await acceptOrder(order.id, profile.id);
+    if (error) {
+        Alert.alert('Error', 'Could not accept order. It may have been taken.');
         setAcceptingId(null);
-        router.push('/(driver)/active');
-    };
+        await refresh();
+        return;
+    }
+    setActiveDelivery({ ...order, status: 'confirmed', driver_id: profile.id });
+    setAcceptingId(null);
+    router.push('/(driver)/active');
+};
 
     const handleSimulate = async (order: OrderWithItems) => {
         setAcceptingId(order.id);

@@ -77,14 +77,14 @@ export default function RootLayout() {
         <ErrorBoundary>
             <QueryClientProvider client={queryClient}>
                 <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
-                     <PaystackProvider publicKey={process.env.EXPO_PUBLIC_PAYSTACK_KEY ?? ''}>
+                    <PaystackProvider publicKey={process.env.EXPO_PUBLIC_PAYSTACK_KEY ?? ''}>
                     <Stack screenOptions={{ headerShown: false }}>
                         <Stack.Screen name="(auth)" />
                         <Stack.Screen name="(customer)" />
                         <Stack.Screen name="(driver)" />
                         <Stack.Screen name="index" />
                     </Stack>
-                     </PaystackProvider>
+                    </PaystackProvider>
                 </GestureHandlerRootView>
             </QueryClientProvider>
         </ErrorBoundary>

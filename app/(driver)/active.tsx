@@ -77,17 +77,20 @@ export default function DriverActiveScreen() {
     const cameraRef = useRef<any>(null);
 
     const refreshRoute = useCallback(async (
-        origin: { lat: number; lng: number },
-        destination: { lat: number; lng: number }
-    ) => {
-        const result = await getRoute(origin, destination);
-        if (result) setRoute(result);
-    }, []);
+    origin: { lat: number; lng: number },
+    destination: { lat: number; lng: number }
+) => {
+    if (Platform.OS === 'web') return;
+    const result = await getRoute(origin, destination);
+    if (result) setRoute(result);
+}, []);
 
     useEffect(() => {
-        if (!order || !driverCoords) return;
-        refreshRoute(driverCoords, { lat: order.delivery_lat, lng: order.delivery_lng });
-    }, [order?.id, driverCoords?.lat]);
+    if (!order || !driverCoords) return;
+    if (!driverCoords.lat || !driverCoords.lng) return;
+    if (!order.delivery_lat || !order.delivery_lng) return;
+    refreshRoute(driverCoords, { lat: order.delivery_lat, lng: order.delivery_lng });
+}, [order?.id, driverCoords?.lat]);
 
     useEffect(() => {
         if (!smoothedDriver || Platform.OS === 'web') return;
@@ -102,32 +105,23 @@ export default function DriverActiveScreen() {
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
     const handleUpdateStatus = async () => {
-        if (!order) return;
-        const next = NEXT_STATUS[order.status];
-        if (!next) return;
-        Alert.alert(next.label, `Confirm: ${next.label}?`, [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Confirm',
-                onPress: async () => {
-                    setUpdatingStatus(true);
-                    const { error } = await updateDeliveryStatus(order.id, next.status);
-                    if (error) {
-                        Alert.alert('Error', 'Could not update status. Try again.');
-                    } else {
-                        setOrder((prev) => prev ? { ...prev, status: next.status } : prev);
-                        if (next.status === 'delivered') {
-                            setActiveDelivery(null);
-                            Alert.alert('Delivery Complete! 🎉', 'Great job!', [
-                                { text: 'OK', onPress: () => router.replace('/(driver)') },
-                            ]);
-                        }
-                    }
-                    setUpdatingStatus(false);
-                },
-            },
-        ]);
-    };
+    if (!order) return;
+    const next = NEXT_STATUS[order.status];
+    if (!next) return;
+
+    setUpdatingStatus(true);
+    const { error } = await updateDeliveryStatus(order.id, next.status);
+    if (error) {
+        Alert.alert('Error', 'Could not update status. Try again.');
+    } else {
+        setOrder((prev) => prev ? { ...prev, status: next.status } : prev);
+        if (next.status === 'delivered') {
+            setActiveDelivery(null);
+            setTimeout(() => router.replace('/(driver)'), 8000);
+        }
+    }
+    setUpdatingStatus(false);
+};
 
     const currentStatus = order?.status ?? 'confirmed';
     const accentColor = STATUS_COLOR[currentStatus] ?? colors.primary;

@@ -30,10 +30,10 @@ export default function Index() {
 
   return (
     <View style={tw`flex-1 items-center justify-center bg-[#0A0A0A]`}>
-      <Image source={require('../assets/icon.png')} style={tw`w-30 h-30 mb-4`} />
+      <Image source={require('../assets/icon.png')} style={tw`w-20 h-20 mb-4`} />
       <Text weight='bold' style={tw`text-white text-3xl mb-2`}>DashDish</Text>
       <Text style={tw`text-[#7C3AED] text-base mb-8`}>
-        Food delivery, redefined
+        Food ordering & delivery, redefined
       </Text>
       <ActivityIndicator color={colors.primary} size="large" />
     </View>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, TextInput } from 'react-native';
-import { Text } from '../../../components/ui/AppText';
+import { Text } from './ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
-import colors from '../../../constants/colors';
+import colors from '../constants/colors';
 
 interface ProfileFieldProps {
     icon: string;

@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-    View,
-    ScrollView,
-    TouchableOpacity,
-    TextInput,
-    Alert,
-    ActivityIndicator,
-} from 'react-native';
+import { View, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { Text } from '../../../components/ui/AppText';
 import { Ionicons } from '@expo/vector-icons';
 import tw from 'twrnc';
@@ -15,54 +8,9 @@ import useAuthStore from '../../../store/useAuthStore';
 import Avatar from '../../../components/ui/Avatar';
 import colors from '../../../constants/colors';
 import ErrorBoundary from '../../../components/ErrorBoundary';
+import { ProfileField } from '../../../components/ProfileField';
+import { Divider } from '../../../components/driver/profile/Divider';
 
-function Divider() {
-    return <View style={[tw`ml-16`, { height: 1, backgroundColor: colors.border }]} />;
-}
-
-function ProfileField({
-    icon,
-    label,
-    value,
-    onChange,
-    placeholder,
-    keyboardType = 'default',
-    multiline = false,
-}: {
-    icon: string;
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-    placeholder: string;
-    keyboardType?: any;
-    multiline?: boolean;
-}) {
-    return (
-        <View style={tw`flex-row items-start px-4 py-3`}>
-            <View style={tw`w-9 h-9 rounded-full bg-[${colors.border}] items-center justify-center mr-3 mt-0.5`}>
-                <Ionicons name={icon as any} size={18} color={colors.textMuted} />
-            </View>
-            <View style={tw`flex-1`}>
-                <Text style={tw`text-[${colors.textMuted}] text-[10px] uppercase tracking-widest mb-0.5`}>
-                    {label}
-                </Text>
-                <TextInput
-                    value={value}
-                    onChangeText={onChange}
-                    placeholder={placeholder}
-                    placeholderTextColor={colors.textMuted}
-                    keyboardType={keyboardType}
-                    multiline={multiline}
-                    style={[
-                        tw`text-[${colors.textPrimary}] text-sm p-0`,
-                        multiline && tw`mt-1`,
-                        { outline: 'none' } as any,
-                    ]}
-                />
-            </View>
-        </View>
-    );
-}
 
 export default function CustomerProfileScreen() {
     const { profile, setProfile, clearAuth } = useAuthStore();

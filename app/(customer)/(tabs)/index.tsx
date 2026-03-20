@@ -1,15 +1,6 @@
-import React from 'react';
-import {
-    View,
-    TextInput,
-    ScrollView,
-    // Text,
-    TouchableOpacity,
-    RefreshControl,
-    FlatList,
-} from 'react-native';
+import { View, TextInput, ScrollView, TouchableOpacity, RefreshControl} from 'react-native';
 import { Text } from '../../../components/ui/AppText';
-import { useState, useEffect, useCallback } from 'react';
+import  React, { useState, useEffect, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import tw from 'twrnc';
