@@ -390,5 +390,3 @@ OTP         : 123456
 MIT License — see [LICENSE](LICENSE) for details.
 
 ---
-
-<p align="center">Built using Expo, Supabase, and Mapbox</p>
