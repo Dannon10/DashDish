@@ -2,7 +2,7 @@
 
 A full-stack food delivery mobile application built with React Native and Expo, featuring real-time order tracking, live driver location updates, and a complete dual-role system for customers and drivers.
 
-> Built as a portfolio project targeting the Nigerian market (Lagos) — demonstrating production-grade mobile development patterns including real-time data sync, GPS tracking, animated map interactions, and a robust simulation engine for demo purposes.
+> Built as a portfolio project targeting the Nigerian market (Lagos) demonstrating production-grade mobile development patterns including real-time data sync, GPS tracking, animated map interactions, and a robust simulation engine for demo purposes.
 
 ---
 
