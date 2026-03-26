@@ -6,6 +6,9 @@ A full-stack food delivery mobile application built with React Native and Expo, 
 
 ---
 
+## Demo video
+Watch here: https://youtube.com/shorts/NLNUNUgyd7s?feature=share
+
 ## Features
 
 ### Customer
